@@ -8,6 +8,15 @@ namespace Filip_Rados_lab2.Controllers
     {
         public IActionResult Index()
         {
+            ViewBag.RecentPosts = DataSeeder.Posts
+                .OrderByDescending(p => p.CreatedAt)
+                .Take(10)
+                .ToList();
+            ViewBag.TotalPosts    = DataSeeder.Posts.Count;
+            ViewBag.TotalUsers    = DataSeeder.Users.Count;
+            ViewBag.TotalComments = DataSeeder.Comments.Count;
+            ViewBag.TotalLikes    = DataSeeder.Likes.Count;
+            ViewBag.Likes         = DataSeeder.Likes;
             return View();
         }
 

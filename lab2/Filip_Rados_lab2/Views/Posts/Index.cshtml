@@ -1,0 +1,91 @@
+﻿@model List<Filip_Rados_lab2.Models.Post>
+@using Filip_Rados_lab2.Models
+@{
+    ViewData["Title"] = "Posts";
+    var activeCategory = ViewBag.ActiveCategory as string;
+}
+
+<div class="lh-feed-wrapper">
+
+    <div class="lh-section-header">
+        <h2 class="lh-section-title">
+            @if (!string.IsNullOrEmpty(activeCategory))
+            {
+                <span>Kategorija: @activeCategory</span>
+            }
+            else
+            {
+                <span>Svi postovi</span>
+            }
+            <span style="color:var(--color-muted);font-weight:400;font-size:0.85rem;margin-left:8px;">(@Model.Count)</span>
+        </h2>
+        @if (!string.IsNullOrEmpty(activeCategory))
+        {
+            <a class="lh-section-link" asp-controller="Posts" asp-action="Index">
+                <i class="fas fa-times" style="font-size:0.7rem;"></i> Ukloni filter
+            </a>
+        }
+    </div>
+
+    @foreach (var post in Model)
+    {
+        var likeCount = Filip_Rados_lab2.MockRepository.GetLikeCountForPost(post.Id);
+        var commentCount = post.Comments?.Count ?? 0;
+
+        <article class="lh-card">
+            <div class="lh-card__meta">
+                <a asp-controller="Posts" asp-action="Index" asp-route-category="@post.Category.ToString()"
+                       class="lh-card__category" style="text-decoration:none;">
+                    @post.Category
+                </a>
+                <span class="lh-card__date">@post.CreatedAt.ToString("dd. MMM yyyy.")</span>
+            </div>
+
+            <h3 class="lh-card__title">
+                <a asp-controller="Posts" asp-action="Details" asp-route-id="@post.Id">@post.Title</a>
+            </h3>
+
+            <p class="lh-card__excerpt">
+                @(post.Content.Length > 3
+                    ? post.Content.Substring(0, Math.Min(160, post.Content.Length)) + "…"
+                    : "Nema opisa.")
+            </p>
+
+            @if (post.Tags != null && post.Tags.Any())
+            {
+                <div class="lh-card__tags">
+                    @foreach (var tag in post.Tags)
+                    {
+                        <a asp-controller="Tags" asp-action="Details" asp-route-id="@tag.Id" class="lh-tag"
+                           style="text-decoration:none;">#@tag.Name</a>
+                    }
+                </div>
+            }
+
+            <div class="lh-card__footer">
+                <div class="lh-card__author">
+                    <i class="fas fa-user-circle" style="font-size:1.1rem;"></i>
+                    <a asp-controller="Users" asp-action="Details" asp-route-id="@post.AuthorId"
+                       style="color:inherit;text-decoration:none;">@post.Author?.Username</a>
+                </div>
+                <div class="lh-card__actions">
+                    <span><i class="fas fa-heart"></i> @likeCount</span>
+                    <span><i class="fas fa-comment"></i> @commentCount</span>
+                    <a asp-controller="Posts" asp-action="Details" asp-route-id="@post.Id"
+                           style="color:inherit;text-decoration:none;font-weight:600;">
+                        Čitaj <i class="fas fa-arrow-right" style="font-size:0.7rem;"></i>
+                    </a>
+                </div>
+            </div>
+        </article>
+    }
+
+    @if (!Model.Any())
+    {
+        <div class="lh-card" style="text-align:center;padding:3rem;color:var(--color-muted);">
+            <i class="fas fa-inbox" style="font-size:2rem;margin-bottom:1rem;display:block;"></i>
+            Nema postova u ovoj kategoriji.
+        </div>
+    }
+
+</div>

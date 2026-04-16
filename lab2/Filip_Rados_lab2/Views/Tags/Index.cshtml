@@ -1,0 +1,46 @@
+@model List<Filip_Rados_lab2.Models.Tag>
+@{
+    ViewData["Title"] = "Tags";
+}
+
+<div class="lh-feed-wrapper">
+
+    <div class="lh-section-header">
+        <h2 class="lh-section-title">
+            Tagovi
+            <span style="color:var(--color-muted);font-weight:400;font-size:0.85rem;margin-left:8px;">(@Model.Count)</span>
+        </h2>
+    </div>
+
+    <div class="lh-card" style="padding:0;overflow:hidden;">
+        <table class="lh-table">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Naziv</th>
+                    <th>Broj postova</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var tag in Model)
+                {
+                    <tr>
+                        <td style="color:var(--color-muted);">@tag.Id</td>
+                        <td style="font-weight:600;">
+                            <span class="lh-tag">#@tag.Name</span>
+                        </td>
+                        <td>@(tag.Posts?.Count ?? 0)</td>
+                        <td>
+                            <a asp-controller="Tags" asp-action="Details" asp-route-id="@tag.Id"
+                               style="font-size:0.78rem;color:var(--color-muted);text-decoration:none;">
+                                Detalji <i class="fas fa-arrow-right" style="font-size:0.65rem;"></i>
+                            </a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+</div>

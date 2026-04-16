@@ -1,0 +1,52 @@
+@model List<Filip_Rados_lab2.Models.User>
+@{
+    ViewData["Title"] = "Users";
+}
+
+<div class="lh-feed-wrapper">
+
+    <div class="lh-section-header">
+        <h2 class="lh-section-title">
+            Korisnici
+            <span style="color:var(--color-muted);font-weight:400;font-size:0.85rem;margin-left:8px;">(@Model.Count)</span>
+        </h2>
+    </div>
+
+    <div class="lh-card" style="padding:0;overflow:hidden;">
+        <table class="lh-table">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Korisničko ime</th>
+                    <th>Ime i prezime</th>
+                    <th>Email</th>
+                    <th>Datum rođenja</th>
+                    <th>Postovi</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var user in Model)
+                {
+                    <tr>
+                        <td style="color:var(--color-muted);">@user.Id</td>
+                        <td style="font-weight:600;">
+                            <i class="fas fa-user-circle" style="margin-right:6px;color:var(--color-muted);"></i>@user.Username
+                        </td>
+                        <td>@user.FirstName @user.LastName</td>
+                        <td style="color:var(--color-muted);">@user.Email</td>
+                        <td style="color:var(--color-muted);">@user.DateOfBirth.ToString("dd. MM. yyyy.")</td>
+                        <td>@(user.Posts?.Count ?? 0)</td>
+                        <td>
+                            <a asp-controller="Users" asp-action="Details" asp-route-id="@user.Id"
+                               style="font-size:0.78rem;color:var(--color-muted);text-decoration:none;">
+                                Detalji <i class="fas fa-arrow-right" style="font-size:0.65rem;"></i>
+                            </a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+</div>

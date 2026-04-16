@@ -27,6 +27,6 @@ app.MapControllerRoute(
     pattern: "{controller=Home}/{action=Index}/{id?}")
     .WithStaticAssets();
 
-DataSeeder.Run();
+//DataSeeder.Run();
 
 app.Run();

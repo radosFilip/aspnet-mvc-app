@@ -1,0 +1,128 @@
+@model Filip_Rados_lab2.Models.User
+@{
+    ViewData["Title"] = Model.Username;
+    var posts     = ViewBag.Posts     as List<Filip_Rados_lab2.Models.Post>    ?? new();
+    var comments  = ViewBag.Comments  as List<Filip_Rados_lab2.Models.Comment> ?? new();
+    var following = ViewBag.Following as List<Filip_Rados_lab2.Models.User>    ?? new();
+    var followers = ViewBag.Followers as List<Filip_Rados_lab2.Models.User>    ?? new();
+}
+
+<div class="lh-feed-wrapper">
+
+    <!-- Breadcrumbs -->
+    <nav class="lh-breadcrumbs">
+        <a asp-controller="Home" asp-action="Index">Home</a>
+        <span>/</span>
+        <a asp-controller="Users" asp-action="Index">Users</a>
+        <span>/</span>
+        <span>@Model.Username</span>
+    </nav>
+
+    <!-- Profil kartica -->
+    <div class="lh-card" style="display:flex;align-items:center;gap:1.5rem;">
+        <i class="fas fa-user-circle" style="font-size:4rem;color:var(--color-muted);flex-shrink:0;"></i>
+        <div>
+            <h1 style="font-size:1.5rem;font-weight:900;margin:0 0 0.25rem;">@Model.FirstName @Model.LastName</h1>
+            <div style="color:var(--color-muted);font-size:0.9rem;">@@@Model.Username</div>
+            <div style="color:var(--color-muted);font-size:0.85rem;margin-top:4px;">@Model.Email</div>
+        </div>
+        <div style="margin-left:auto;display:flex;gap:2rem;text-align:center;">
+            <div>
+                <div style="font-size:1.5rem;font-weight:900;">@posts.Count</div>
+                <div style="font-size:0.72rem;color:var(--color-muted);text-transform:uppercase;letter-spacing:0.06em;">Postovi</div>
+            </div>
+            <div>
+                <div style="font-size:1.5rem;font-weight:900;">@followers.Count</div>
+                <div style="font-size:0.72rem;color:var(--color-muted);text-transform:uppercase;letter-spacing:0.06em;">Pratitelji</div>
+            </div>
+            <div>
+                <div style="font-size:1.5rem;font-weight:900;">@following.Count</div>
+                <div style="font-size:0.72rem;color:var(--color-muted);text-transform:uppercase;letter-spacing:0.06em;">Prati</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Detalji tablica -->
+    <div class="lh-card">
+        <div class="lh-section-header" style="margin-bottom:1rem;">
+            <h3 class="lh-section-title">Informacije</h3>
+        </div>
+        <table class="lh-table">
+            <tbody>
+                <tr><th>ID</th><td>@Model.Id</td></tr>
+                <tr><th>Ime</th><td>@Model.FirstName</td></tr>
+                <tr><th>Prezime</th><td>@Model.LastName</td></tr>
+                <tr><th>Korisničko ime</th><td>@@@Model.Username</td></tr>
+                <tr><th>Email</th><td>@Model.Email</td></tr>
+                <tr><th>Datum rođenja</th><td>@Model.DateOfBirth.ToString("dd. MM. yyyy.")</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Postovi -->
+    @if (posts.Any())
+    {
+        <div class="lh-card">
+            <div class="lh-section-header" style="margin-bottom:1rem;">
+                <h3 class="lh-section-title"><i class="fas fa-newspaper" style="margin-right:6px;"></i>Postovi (@posts.Count)</h3>
+            </div>
+            <table class="lh-table">
+                <thead>
+                    <tr><th>Naslov</th><th>Kategorija</th><th>Datum</th><th></th></tr>
+                </thead>
+                <tbody>
+                    @foreach (var post in posts)
+                    {
+                        <tr>
+                            <td style="font-weight:600;">@post.Title</td>
+                            <td><span class="lh-card__category">@post.Category</span></td>
+                            <td style="color:var(--color-muted);">@post.CreatedAt.ToString("dd. MM. yyyy.")</td>
+                            <td>
+                                <a asp-controller="Posts" asp-action="Details" asp-route-id="@post.Id"
+                                   style="font-size:0.78rem;color:var(--color-muted);text-decoration:none;">
+                                    Detalji <i class="fas fa-arrow-right" style="font-size:0.65rem;"></i>
+                                </a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+
+    <!-- Komentari -->
+    @if (comments.Any())
+    {
+        <div class="lh-card">
+            <div class="lh-section-header" style="margin-bottom:1rem;">
+                <h3 class="lh-section-title"><i class="fas fa-comments" style="margin-right:6px;"></i>Komentari (@comments.Count)</h3>
+            </div>
+            <table class="lh-table">
+                <thead>
+                    <tr><th>Komentar</th><th>Post</th><th>Datum</th></tr>
+                </thead>
+                <tbody>
+                    @foreach (var comment in comments)
+                    {
+                        <tr>
+                            <td>@comment.Content</td>
+                            <td>
+                                <a asp-controller="Posts" asp-action="Details" asp-route-id="@comment.PostId"
+                                   style="color:inherit;text-decoration:none;">@comment.Post?.Title</a>
+                            </td>
+                            <td style="color:var(--color-muted);">@comment.CreatedAt.ToString("dd. MM. yyyy.")</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+
+    <div style="margin-top:0.5rem;">
+        <a asp-controller="Users" asp-action="Index"
+           style="color:var(--color-muted);font-size:0.85rem;text-decoration:none;">
+            <i class="fas fa-arrow-left" style="font-size:0.7rem;margin-right:4px;"></i> Natrag na listu
+        </a>
+    </div>
+
+</div>

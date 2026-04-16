@@ -1,47 +1,210 @@
 ﻿<!DOCTYPE html>
-<html lang="en">
+<html lang="hr">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - Filip_Rados_lab2</title>
+    <title>@ViewData["Title"] - LifeHack4Life</title>
     <script type="importmap"></script>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/Filip_Rados_lab2.styles.css" asp-append-version="true" />
+    <style>
+        :root {
+            --color-nav-bg:    #FFD600;
+            --color-nav-hover: #E6C000;
+            --color-nav-text:  #1A1A1A;
+            --color-page-bg:   #F5F5F5;
+            --color-card-bg:   #FFFFFF;
+            --color-shadow:    rgba(0,0,0,0.08);
+            --color-text:      #1A1A1A;
+            --color-muted:     #6B7280;
+            --color-tag-bg:    #EFEFEF;
+            --color-tag-text:  #374151;
+            --color-border:    #E5E7EB;
+        }
+        *, *::before, *::after { box-sizing: border-box; }
+        body {
+            background: var(--color-page-bg);
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            margin: 0; padding: 0;
+            color: var(--color-text);
+        }
+        /* ── NAVBAR ─────────────────────────── */
+        .lh-navbar {
+            height: 72px;
+            background: var(--color-nav-bg);
+            display: flex; align-items: center;
+            justify-content: space-between;
+            padding: 0 2.5rem;
+            position: sticky; top: 0; z-index: 1000;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.14);
+        }
+        .lh-nav-left  { flex: 1; display: flex; align-items: center; gap: 4px; }
+        .lh-nav-center { flex: 0 0 auto; }
+        .lh-nav-right { flex: 1; display: flex; align-items: center; justify-content: flex-end; gap: 4px; }
+        .lh-brand {
+            font-size: 1.55rem; font-weight: 900;
+            color: var(--color-nav-text); text-decoration: none;
+            letter-spacing: -0.5px; white-space: nowrap;
+        }
+        .lh-brand:hover { color: #000; text-decoration: none; }
+        /* Dropdown */
+        .lh-dropdown { position: relative; }
+        .lh-dropdown-toggle {
+            background: none; border: none; cursor: pointer;
+            display: flex; align-items: center; gap: 5px;
+            font-size: 0.875rem; font-weight: 600;
+            color: var(--color-nav-text);
+            padding: 7px 11px; border-radius: 7px;
+            transition: background 0.15s; font-family: inherit;
+        }
+        .lh-dropdown-toggle:hover { background: var(--color-nav-hover); }
+        .lh-dropdown-menu {
+            display: none; position: absolute;
+            top: calc(100% + 8px); left: 0;
+            background: #fff; border: 1px solid var(--color-border);
+            border-radius: 10px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+            list-style: none; margin: 0; padding: 6px 0;
+            min-width: 185px; z-index: 1001;
+        }
+        .lh-dropdown-menu--right { left: auto; right: 0; }
+        .lh-dropdown:hover .lh-dropdown-menu,
+        .lh-dropdown:focus-within .lh-dropdown-menu { display: block; }
+        .lh-dropdown-menu li a {
+            display: block; padding: 9px 18px;
+            color: var(--color-text); text-decoration: none;
+            font-size: 0.875rem; transition: background 0.12s;
+        }
+        .lh-dropdown-menu li a:hover { background: #F5F5F5; }
+        .lh-dropdown-menu li + li { border-top: 1px solid #F3F4F6; }
+        /* Nav link */
+        .lh-nav-link {
+            display: flex; align-items: center; gap: 5px;
+            padding: 7px 11px; border-radius: 7px;
+            text-decoration: none; font-size: 0.875rem; font-weight: 600;
+            color: var(--color-nav-text); transition: background 0.15s;
+        }
+        .lh-nav-link:hover { background: var(--color-nav-hover); color: #000; }
+        .lh-nav-link.active { background: rgba(0,0,0,0.10); }
+        /* ── MAIN ────────────────────────────── */
+        .lh-main { background: var(--color-page-bg); min-height: calc(100vh - 72px - 56px); padding: 2.5rem 0; }
+        /* ── FEED ────────────────────────────── */
+        .lh-feed-wrapper { width: 60%; margin: 0 auto; display: flex; flex-direction: column; gap: 1.25rem; }
+        /* ── CARD ────────────────────────────── */
+        .lh-card {
+            background: #fff; border-radius: 14px;
+            padding: 1.5rem 1.75rem;
+            box-shadow: 0 2px 8px var(--color-shadow);
+            border: 1px solid var(--color-border);
+            transition: box-shadow 0.2s, transform 0.2s;
+        }
+        .lh-card:hover { box-shadow: 0 6px 20px rgba(0,0,0,0.12); transform: translateY(-2px); }
+        .lh-card__meta { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.55rem; }
+        .lh-card__category {
+            font-size: 0.7rem; font-weight: 700; text-transform: uppercase;
+            letter-spacing: 0.08em; color: var(--color-muted);
+            background: var(--color-tag-bg); padding: 3px 9px; border-radius: 999px;
+        }
+        .lh-card__date { font-size: 0.78rem; color: var(--color-muted); }
+        .lh-card__title { margin: 0 0 0.5rem; font-size: 1.18rem; font-weight: 700; line-height: 1.3; }
+        .lh-card__title a { color: var(--color-text); text-decoration: none; }
+        .lh-card__title a:hover { text-decoration: underline; }
+        .lh-card__excerpt { color: #374151; font-size: 0.9rem; line-height: 1.65; margin-bottom: 0.85rem; }
+        .lh-card__tags { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 1rem; }
+        .lh-tag { background: var(--color-tag-bg); color: var(--color-tag-text); font-size: 0.7rem; padding: 3px 10px; border-radius: 999px; }
+        .lh-card__footer {
+            display: flex; justify-content: space-between; align-items: center;
+            border-top: 1px solid var(--color-border); padding-top: 0.75rem;
+            font-size: 0.82rem; color: var(--color-muted);
+        }
+        .lh-card__author { display: flex; align-items: center; gap: 6px; }
+        .lh-card__actions { display: flex; gap: 1rem; }
+        .lh-card__actions span { display: flex; align-items: center; gap: 4px; }
+        /* ── STAT CARDS ──────────────────────── */
+        .lh-stats { display: flex; gap: 1rem; margin-bottom: 2rem; }
+        .lh-stat-card {
+            flex: 1; background: #fff; border-radius: 12px;
+            padding: 1.2rem 1.5rem; text-align: center;
+            border: 1px solid var(--color-border);
+            box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+        }
+        .lh-stat-card__num { font-size: 2.1rem; font-weight: 900; color: var(--color-text); line-height: 1; }
+        .lh-stat-card__label { font-size: 0.72rem; color: var(--color-muted); text-transform: uppercase; letter-spacing: 0.08em; font-weight: 600; margin-top: 4px; }
+        /* ── SECTION HEADER ──────────────────── */
+        .lh-section-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.25rem; }
+        .lh-section-title { font-size: 1.05rem; font-weight: 800; letter-spacing: -0.2px; margin: 0; }
+        .lh-section-link { font-size: 0.82rem; color: var(--color-muted); text-decoration: none; }
+        .lh-section-link:hover { color: var(--color-text); text-decoration: underline; }
+        /* ── BREADCRUMBS ─────────────────────── */
+        .lh-breadcrumbs { font-size: 0.8rem; color: var(--color-muted); margin-bottom: 1.5rem; }
+        .lh-breadcrumbs a { color: var(--color-muted); text-decoration: none; }
+        .lh-breadcrumbs a:hover { text-decoration: underline; }
+        .lh-breadcrumbs span { margin: 0 5px; }
+        /* ── FOOTER ──────────────────────────── */
+        .lh-footer {
+            text-align: center; padding: 1rem 2rem;
+            font-size: 0.8rem; color: var(--color-muted);
+            border-top: 1px solid var(--color-border); background: #fff; height: 56px;
+            display: flex; align-items: center; justify-content: center;
+        }
+        /* ── TABLE (za Details) ───────────────── */
+        .lh-table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
+        .lh-table th, .lh-table td { padding: 10px 14px; text-align: left; border-bottom: 1px solid var(--color-border); }
+        .lh-table th { font-weight: 700; color: var(--color-muted); font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.06em; }
+        .lh-table tr:last-child td { border-bottom: none; }
+        .lh-table tr:hover td { background: #FAFAFA; }
+        /* ── RESPONSIVE ──────────────────────── */
+        @@media (max-width: 900px) {
+            .lh-feed-wrapper { width: 92%; }
+            .lh-stats { flex-wrap: wrap; }
+        }
+        @@media (max-width: 640px) {
+            .lh-navbar { padding: 0 1rem; }
+            .lh-brand { font-size: 1.15rem; }
+            .lh-nav-link span { display: none; }
+            .lh-feed-wrapper { width: 100%; padding: 0 0.75rem; }
+        }
+    </style>
 </head>
 <body>
-    <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
-            <div class="container-fluid">
-                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">Filip_Rados_lab2</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                        aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
+    <nav class="lh-navbar">
+        <div class="lh-nav-left">
+            <!-- Index dropdown -->
+            <div class="lh-dropdown">
+                <button class="lh-dropdown-toggle">
+                    <span>Index</span>
+                    <i class="fas fa-chevron-down" style="font-size:0.6rem;margin-top:1px;"></i>
                 </button>
-                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                    <ul class="navbar-nav flex-grow-1">
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
-                        </li>
-                    </ul>
-                </div>
+                <ul class="lh-dropdown-menu">
+                    <li><a asp-controller="Posts" asp-action="Index">Posts</a></li>
+                    <li><a asp-controller="Users" asp-action="Index">Users</a></li>
+                    <li><a asp-controller="Comments" asp-action="Index">Comments</a></li>
+                    <li><a asp-controller="Tags" asp-action="Index">Tags</a></li>
+                    <li><a asp-controller="Messages" asp-action="Index">Messages</a></li>
+                    <li><a asp-controller="Reports" asp-action="Index">Reports</a></li>
+                </ul>
             </div>
-        </nav>
-    </header>
-    <div class="container">
-        <main role="main" class="pb-3">
-            @RenderBody()
-        </main>
-    </div>
-
-    <footer class="border-top footer text-muted">
-        <div class="container">
-            &copy; 2026 - Filip_Rados_lab2 - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
         </div>
+
+        <div class="lh-nav-center">
+            <a asp-controller="Home" asp-action="Index" class="lh-brand">LifeHack4Life</a>
+        </div>
+
+        <div class="lh-nav-right">
+            <i class="fas fa-user-circle" style="font-size:1.45rem;color:var(--color-nav-text);"></i>
+        </div>
+    </nav>
+
+    <main class="lh-main">
+        @RenderBody()
+    </main>
+
+    <footer class="lh-footer">
+        &copy; 2026 LifeHack4Life &mdash; Filip Radoš
     </footer>
+
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>

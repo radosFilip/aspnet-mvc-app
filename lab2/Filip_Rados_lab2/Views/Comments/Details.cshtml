@@ -1,0 +1,54 @@
+@model Filip_Rados_lab2.Models.Comment
+@{
+    ViewData["Title"] = "Komentar #" + Model.Id;
+}
+
+<div class="lh-feed-wrapper">
+
+    <!-- Breadcrumbs -->
+    <nav class="lh-breadcrumbs">
+        <a asp-controller="Home" asp-action="Index">Home</a>
+        <span>/</span>
+        <a asp-controller="Comments" asp-action="Index">Comments</a>
+        <span>/</span>
+        <span>Komentar #@Model.Id</span>
+    </nav>
+
+    <!-- Detalji tablica -->
+    <div class="lh-card">
+        <div class="lh-section-header" style="margin-bottom:1rem;">
+            <h3 class="lh-section-title">Detalji komentara</h3>
+        </div>
+        <table class="lh-table">
+            <tbody>
+                <tr><th>ID</th><td>@Model.Id</td></tr>
+                <tr><th>Komentar</th><td>@Model.Content</td></tr>
+                <tr>
+                    <th>Autor</th>
+                    <td>
+                        <a asp-controller="Users" asp-action="Details" asp-route-id="@Model.AuthorId"
+                           style="color:inherit;text-decoration:none;font-weight:600;">
+                            <i class="fas fa-user-circle" style="margin-right:6px;"></i>@Model.Author?.Username
+                        </a>
+                    </td>
+                </tr>
+                <tr>
+                    <th>Post</th>
+                    <td>
+                        <a asp-controller="Posts" asp-action="Details" asp-route-id="@Model.PostId"
+                           style="color:inherit;text-decoration:none;">@Model.Post?.Title</a>
+                    </td>
+                </tr>
+                <tr><th>Datum</th><td>@Model.CreatedAt.ToString("dd. MM. yyyy. HH:mm")</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div style="margin-top:0.5rem;">
+        <a asp-controller="Comments" asp-action="Index"
+           style="color:var(--color-muted);font-size:0.85rem;text-decoration:none;">
+            <i class="fas fa-arrow-left" style="font-size:0.7rem;margin-right:4px;"></i> Natrag na listu
+        </a>
+    </div>
+
+</div>

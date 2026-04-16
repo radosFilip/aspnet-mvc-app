@@ -1,0 +1,145 @@
+﻿@model Filip_Rados_lab2.Models.Post
+@{
+    ViewData["Title"] = Model.Title;
+    var likeCount = (int)(ViewBag.LikeCount ?? 0);
+}
+
+<div class="lh-feed-wrapper">
+
+    <!-- Breadcrumbs -->
+    <nav class="lh-breadcrumbs">
+        <a asp-controller="Home" asp-action="Index">Home</a>
+        <span>/</span>
+        <a asp-controller="Posts" asp-action="Index">Posts</a>
+        <span>/</span>
+        <span>@Model.Title</span>
+    </nav>
+
+    <!-- Glavni post -->
+    <div class="lh-card">
+        <div class="lh-card__meta">
+            <a asp-controller="Posts" asp-action="Index" asp-route-category="@Model.Category.ToString()"
+               class="lh-card__category" style="text-decoration:none;">@Model.Category</a>
+            <span class="lh-card__date">@Model.CreatedAt.ToString("dd. MMMM yyyy.")</span>
+        </div>
+
+        <h1 style="font-size:1.6rem;font-weight:900;margin:0.5rem 0 1rem;">@Model.Title</h1>
+
+        <p style="font-size:0.95rem;line-height:1.75;color:#374151;margin-bottom:1.5rem;">@Model.Content</p>
+
+        @if (Model.Tags != null && Model.Tags.Any())
+        {
+            <div class="lh-card__tags" style="margin-bottom:1.25rem;">
+                @foreach (var tag in Model.Tags)
+                {
+                    <a asp-controller="Tags" asp-action="Details" asp-route-id="@tag.Id"
+                       class="lh-tag" style="text-decoration:none;">#@tag.Name</a>
+                }
+            </div>
+        }
+
+        <div class="lh-card__footer">
+            <div class="lh-card__author">
+                <i class="fas fa-user-circle" style="font-size:1.2rem;"></i>
+                <a asp-controller="Users" asp-action="Details" asp-route-id="@Model.AuthorId"
+                   style="color:inherit;text-decoration:none;font-weight:600;">@Model.Author?.Username</a>
+            </div>
+            <div class="lh-card__actions">
+                <span><i class="fas fa-heart"></i> @likeCount lajkova</span>
+                <span><i class="fas fa-comment"></i> @(Model.Comments?.Count ?? 0) komentara</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Detalji tablica -->
+    <div class="lh-card">
+        <div class="lh-section-header" style="margin-bottom:1rem;">
+            <h3 class="lh-section-title">Detalji posta</h3>
+        </div>
+        <table class="lh-table">
+            <tbody>
+                <tr><th>ID</th><td>@Model.Id</td></tr>
+                <tr><th>Naslov</th><td>@Model.Title</td></tr>
+                <tr><th>Kategorija</th><td>@Model.Category</td></tr>
+                <tr>
+                    <th>Autor</th>
+                    <td>
+                        <a asp-controller="Users" asp-action="Details" asp-route-id="@Model.AuthorId"
+                           style="color:inherit;">@Model.Author?.Username</a>
+                    </td>
+                </tr>
+                <tr><th>Objavljeno</th><td>@Model.CreatedAt.ToString("dd. MM. yyyy. HH:mm")</td></tr>
+                <tr><th>Lajkovi</th><td>@likeCount</td></tr>
+                <tr><th>Komentari</th><td>@(Model.Comments?.Count ?? 0)</td></tr>
+                <tr>
+                    <th>Tagovi</th>
+                    <td>
+                        @if (Model.Tags != null && Model.Tags.Any())
+                        {
+                            @string.Join(", ", Model.Tags.Select(t => t.Name))
+                        }
+                        else
+                        {
+
+                            <span style="color:var(--color-muted);">—</span>
+                        }
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Komentari -->
+    @if (Model.Comments != null && Model.Comments.Any())
+    {
+        <div class="lh-card">
+            <div class="lh-section-header" style="margin-bottom:1rem;">
+                <h3 class="lh-section-title">
+                    <i class="fas fa-comments" style="margin-right:6px;"></i>
+                    Komentari (@Model.Comments.Count)
+                </h3>
+            </div>
+            <table class="lh-table">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Autor</th>
+                        <th>Komentar</th>
+                        <th>Datum</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var comment in Model.Comments)
+                    {
+                        <tr>
+                            <td style="color:var(--color-muted);">@comment.Id</td>
+                            <td>
+                                <a asp-controller="Users" asp-action="Details" asp-route-id="@comment.AuthorId"
+                                       style="color:inherit;text-decoration:none;font-weight:600;">
+                                    <i class="fas fa-user-circle" style="margin-right:4px;"></i>@comment.Author?.Username
+                                </a>
+                            </td>
+                            <td>@comment.Content</td>
+                            <td style="color:var(--color-muted);">@comment.CreatedAt.ToString("dd. MM. yyyy.")</td>
+                            <td>
+                                <a asp-controller="Comments" asp-action="Details" asp-route-id="@comment.Id"
+                                       style="font-size:0.78rem;color:var(--color-muted);text-decoration:none;">
+                                    Detalji <i class="fas fa-arrow-right" style="font-size:0.65rem;"></i>
+                                </a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+
+    <div style="margin-top:0.5rem;">
+        <a asp-controller="Posts" asp-action="Index"
+               style="color:var(--color-muted);font-size:0.85rem;text-decoration:none;">
+            <i class="fas fa-arrow-left" style="font-size:0.7rem;margin-right:4px;"></i> Natrag na listu
+        </a>
+    </div>
+
+</div>

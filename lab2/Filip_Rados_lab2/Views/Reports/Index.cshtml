@@ -1,0 +1,71 @@
+@model List<Filip_Rados_lab2.Models.Report>
+@{
+    ViewData["Title"] = "Reports";
+}
+
+<div class="lh-feed-wrapper">
+
+    <div class="lh-section-header">
+        <h2 class="lh-section-title">
+            Reporti
+            <span style="color:var(--color-muted);font-weight:400;font-size:0.85rem;margin-left:8px;">(@Model.Count)</span>
+        </h2>
+    </div>
+
+    <div class="lh-card" style="padding:0;overflow:hidden;">
+        <table class="lh-table">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Reporter</th>
+                    <th>Post</th>
+                    <th>Razlog</th>
+                    <th>Status</th>
+                    <th>Datum</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var report in Model)
+                {
+                    <tr>
+                        <td style="color:var(--color-muted);">@report.Id</td>
+                        <td style="font-weight:600;">
+                            <a asp-controller="Users" asp-action="Details" asp-route-id="@report.ReporterId"
+                               style="color:inherit;text-decoration:none;">
+                                <i class="fas fa-user-circle" style="margin-right:6px;color:var(--color-muted);"></i>@report.Reporter?.Username
+                            </a>
+                        </td>
+                        <td>
+                            <a asp-controller="Posts" asp-action="Details" asp-route-id="@report.PostId"
+                               style="color:inherit;text-decoration:none;">@report.Post?.Title</a>
+                        </td>
+                        <td>@report.Reason</td>
+                        <td>
+                            @if (report.Status == Filip_Rados_lab2.Models.ReportStatus.Pending)
+                            {
+                                <span style="color:#d97706;font-size:0.8rem;font-weight:600;">Pending</span>
+                            }
+                            else if (report.Status == Filip_Rados_lab2.Models.ReportStatus.Reviewed)
+                            {
+                                <span style="color:#16a34a;font-size:0.8rem;font-weight:600;">Reviewed</span>
+                            }
+                            else
+                            {
+                                <span style="color:var(--color-muted);font-size:0.8rem;font-weight:600;">Dismissed</span>
+                            }
+                        </td>
+                        <td style="color:var(--color-muted);">@report.CreatedAt.ToString("dd. MM. yyyy.")</td>
+                        <td>
+                            <a asp-controller="Reports" asp-action="Details" asp-route-id="@report.Id"
+                               style="font-size:0.78rem;color:var(--color-muted);text-decoration:none;">
+                                Detalji <i class="fas fa-arrow-right" style="font-size:0.65rem;"></i>
+                            </a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+</div>

@@ -1,0 +1,56 @@
+@model List<Filip_Rados_lab2.Models.Comment>
+@{
+    ViewData["Title"] = "Comments";
+}
+
+<div class="lh-feed-wrapper">
+
+    <div class="lh-section-header">
+        <h2 class="lh-section-title">
+            Komentari
+            <span style="color:var(--color-muted);font-weight:400;font-size:0.85rem;margin-left:8px;">(@Model.Count)</span>
+        </h2>
+    </div>
+
+    <div class="lh-card" style="padding:0;overflow:hidden;">
+        <table class="lh-table">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Autor</th>
+                    <th>Komentar</th>
+                    <th>Post</th>
+                    <th>Datum</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var comment in Model)
+                {
+                    <tr>
+                        <td style="color:var(--color-muted);">@comment.Id</td>
+                        <td style="font-weight:600;">
+                            <a asp-controller="Users" asp-action="Details" asp-route-id="@comment.AuthorId"
+                               style="color:inherit;text-decoration:none;">
+                                <i class="fas fa-user-circle" style="margin-right:6px;color:var(--color-muted);"></i>@comment.Author?.Username
+                            </a>
+                        </td>
+                        <td>@comment.Content</td>
+                        <td>
+                            <a asp-controller="Posts" asp-action="Details" asp-route-id="@comment.PostId"
+                               style="color:inherit;text-decoration:none;">@comment.Post?.Title</a>
+                        </td>
+                        <td style="color:var(--color-muted);">@comment.CreatedAt.ToString("dd. MM. yyyy.")</td>
+                        <td>
+                            <a asp-controller="Comments" asp-action="Details" asp-route-id="@comment.Id"
+                               style="font-size:0.78rem;color:var(--color-muted);text-decoration:none;">
+                                Detalji <i class="fas fa-arrow-right" style="font-size:0.65rem;"></i>
+                            </a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+</div>

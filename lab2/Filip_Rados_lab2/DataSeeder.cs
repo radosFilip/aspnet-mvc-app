@@ -4,6 +4,15 @@ namespace Filip_Rados_lab2
 {
     public class DataSeeder
     {
+        public static List<User> Users { get; private set; } = new();
+        public static List<Post> Posts { get; private set; } = new();
+        public static List<Comment> Comments { get; private set; } = new();
+        public static List<Tag> Tags { get; private set; } = new();
+        public static List<Like> Likes { get; private set; } = new();
+        public static List<Follow> Follows { get; private set; } = new();
+        public static List<Message> Messages { get; private set; } = new();
+        public static List<Report> Reports { get; private set; } = new();
+
         public static void Run()
         {
             // ===== KREIRANJE KORISNIKA =====
@@ -194,6 +203,16 @@ namespace Filip_Rados_lab2
 
             Console.WriteLine("\n=== Pending reportovi ===");
             pendingReports.ForEach(r => Console.WriteLine($"- Report ID: {r.Id}, Post: {r.Post.Title}, Reporter: {r.Reporter.Username}, Razlog: {r.Reason}"));
+
+            // ===== EXPOSE PUBLIC DATA =====
+            Users = allUsers;
+            Posts = allPosts;
+            Comments = allComments;
+            Tags = allTags;
+            Likes = allLikes;
+            Follows = allFollows;
+            Messages = allMessages;
+            Reports = allReports;
         }
     }
 }
