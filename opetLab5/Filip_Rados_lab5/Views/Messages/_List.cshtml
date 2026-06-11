@@ -1,0 +1,44 @@
+@model List<Message>
+
+<div class="lh-card lh-list-card">
+    <table class="lh-table">
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>Posiljatelj</th>
+                <th>Primatelj</th>
+                <th>Poruka</th>
+                <th>Datum</th>
+                <th>Procitano</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var message in Model)
+            {
+                <tr>
+                    <td class="lh-muted">@message.Id</td>
+                    <td class="lh-strong"><a asp-controller="Users" asp-action="Details" asp-route-id="@message.SenderId">@message.Sender?.Username</a></td>
+                    <td><a asp-controller="Users" asp-action="Details" asp-route-id="@message.ReceiverId">@message.Receiver?.Username</a></td>
+                    <td>@message.Content</td>
+                    <td class="lh-muted">@message.SentAt.ToString("g")</td>
+                    <td>
+                        <span class="lh-status @(message.IsRead ? "lh-status--ok" : "lh-status--danger")">
+                            @(message.IsRead ? "Da" : "Ne")
+                        </span>
+                    </td>
+                    <td class="lh-row-actions">
+                        <a asp-action="Details" asp-route-id="@message.Id">Detalji</a>
+                        <a asp-action="Edit" asp-route-id="@message.Id">Uredi</a>
+                        <a asp-action="Delete" asp-route-id="@message.Id">Obrisi</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    @if (!Model.Any())
+    {
+        <div class="lh-empty-state"><i class="fas fa-inbox"></i>Nema poruka za zadani upit.</div>
+    }
+</div>

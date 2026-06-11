@@ -1,0 +1,10 @@
+@model FollowFormModel
+
+<input asp-for="Id" type="hidden" />
+<div asp-validation-summary="ModelOnly" class="lh-validation-summary"></div>
+
+<partial name="~/Views/Shared/_Autocomplete.cshtml"
+         model="@(new AutocompleteInputModel { Name = nameof(Model.FollowerId), Label = "Korisnik koji prati", SearchUrl = Url.Action("Autocomplete", "Users") ?? "", SelectedId = Model.FollowerId, SelectedText = Model.FollowerText, Placeholder = "Pretrazi korisnike..." })" />
+
+<partial name="~/Views/Shared/_Autocomplete.cshtml"
+         model="@(new AutocompleteInputModel { Name = nameof(Model.FollowingId), Label = "Korisnik koji se prati", SearchUrl = Url.Action("Autocomplete", "Users") ?? "", SelectedId = Model.FollowingId, SelectedText = Model.FollowingText, Placeholder = "Pretrazi korisnike..." })" />

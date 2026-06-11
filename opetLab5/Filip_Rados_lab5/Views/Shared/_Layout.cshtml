@@ -1,0 +1,345 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - LifeHack4Life</title>
+    <script type="importmap"></script>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/Filip_Rados_lab5.styles.css" asp-append-version="true" />
+    <style>
+        :root {
+            --color-nav-bg:    #FFD600;
+            --color-nav-hover: #E6C000;
+            --color-nav-text:  #1A1A1A;
+            --color-page-bg:   #F5F5F5;
+            --color-card-bg:   #FFFFFF;
+            --color-shadow:    rgba(0,0,0,0.08);
+            --color-text:      #1A1A1A;
+            --color-muted:     #6B7280;
+            --color-tag-bg:    #EFEFEF;
+            --color-tag-text:  #374151;
+            --color-border:    #E5E7EB;
+        }
+        *, *::before, *::after { box-sizing: border-box; }
+        body {
+            background: var(--color-page-bg);
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            margin: 0; padding: 0;
+            color: var(--color-text);
+        }
+        /* ── NAVBAR ─────────────────────────── */
+        .lh-navbar {
+            height: 72px;
+            background: var(--color-nav-bg);
+            display: flex; align-items: center;
+            justify-content: space-between;
+            padding: 0 2.5rem;
+            position: sticky; top: 0; z-index: 1000;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.14);
+        }
+        .lh-nav-left  { flex: 1; display: flex; align-items: center; gap: 4px; }
+        .lh-nav-center { flex: 0 0 auto; }
+        .lh-nav-right { flex: 1; display: flex; align-items: center; justify-content: flex-end; gap: 4px; }
+        .lh-nav-left .lh-nav-link { color: var(--color-nav-text); }
+        .lh-brand {
+            font-size: 1.55rem; font-weight: 900;
+            color: var(--color-nav-text); text-decoration: none;
+            letter-spacing: 0; white-space: nowrap;
+        }
+        .lh-brand:hover { color: #000; text-decoration: none; }
+        /* Dropdown */
+        .lh-dropdown { position: relative; }
+        .lh-dropdown-toggle {
+            background: none; border: none; cursor: pointer;
+            display: flex; align-items: center; gap: 5px;
+            font-size: 0.875rem; font-weight: 600;
+            color: var(--color-nav-text);
+            padding: 7px 11px; border-radius: 7px;
+            transition: background 0.15s; font-family: inherit;
+        }
+        .lh-dropdown-toggle:hover { background: var(--color-nav-hover); }
+        .lh-dropdown-menu {
+            display: none; position: absolute;
+            top: calc(100% + 8px); left: 0;
+            background: #fff; border: 1px solid var(--color-border);
+            border-radius: 10px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+            list-style: none; margin: 0; padding: 6px 0;
+            min-width: 185px; z-index: 1001;
+        }
+        .lh-dropdown-menu--right { left: auto; right: 0; }
+        .lh-dropdown:hover .lh-dropdown-menu,
+        .lh-dropdown:focus-within .lh-dropdown-menu { display: block; }
+        .lh-dropdown-menu li a {
+            display: block; padding: 9px 18px;
+            color: var(--color-text); text-decoration: none;
+            font-size: 0.875rem; transition: background 0.12s;
+        }
+        .lh-dropdown-menu li a:hover { background: #F5F5F5; }
+        .lh-dropdown-menu li + li { border-top: 1px solid #F3F4F6; }
+        /* Nav link */
+        .lh-nav-link {
+            display: flex; align-items: center; gap: 5px;
+            padding: 7px 11px; border-radius: 7px;
+            text-decoration: none; font-size: 0.875rem; font-weight: 600;
+            color: var(--color-nav-text); transition: background 0.15s;
+        }
+        .lh-nav-link:hover { background: var(--color-nav-hover); color: #000; }
+        .lh-nav-link.active { background: rgba(0,0,0,0.10); }
+        .lh-nav-link--primary {
+            font-size: 1rem;
+            padding: 10px 15px;
+            font-weight: 800;
+        }
+        /* ── MAIN ────────────────────────────── */
+        .lh-main { background: var(--color-page-bg); min-height: calc(100vh - 72px - 56px); padding: 2.5rem 0; }
+        /* ── FEED ────────────────────────────── */
+        .lh-feed-wrapper { width: 60%; margin: 0 auto; display: flex; flex-direction: column; gap: 1.25rem; }
+        /* ── CARD ────────────────────────────── */
+        .lh-card {
+            background: #fff; border-radius: 14px;
+            padding: 1.5rem 1.75rem;
+            box-shadow: 0 2px 8px var(--color-shadow);
+            border: 1px solid var(--color-border);
+            transition: box-shadow 0.2s, transform 0.2s;
+        }
+        .lh-card:hover { box-shadow: 0 6px 20px rgba(0,0,0,0.12); transform: translateY(-2px); }
+        .lh-card__meta { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.55rem; }
+        .lh-card__category {
+            font-size: 0.7rem; font-weight: 700; text-transform: uppercase;
+            letter-spacing: 0.08em; color: var(--color-muted);
+            background: var(--color-tag-bg); padding: 3px 9px; border-radius: 999px;
+        }
+        .lh-card__date { font-size: 0.78rem; color: var(--color-muted); }
+        .lh-card__title { margin: 0 0 0.5rem; font-size: 1.18rem; font-weight: 700; line-height: 1.3; }
+        .lh-card__title a { color: var(--color-text); text-decoration: none; }
+        .lh-card__title a:hover { text-decoration: underline; }
+        .lh-card__excerpt { color: #374151; font-size: 0.9rem; line-height: 1.65; margin-bottom: 0.85rem; }
+        .lh-card__tags { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 1rem; }
+        .lh-tag { background: var(--color-tag-bg); color: var(--color-tag-text); font-size: 0.7rem; padding: 3px 10px; border-radius: 999px; }
+        .lh-card__footer {
+            display: flex; justify-content: space-between; align-items: center;
+            border-top: 1px solid var(--color-border); padding-top: 0.75rem;
+            font-size: 0.82rem; color: var(--color-muted);
+        }
+        .lh-card__author { display: flex; align-items: center; gap: 6px; }
+        .lh-card__actions { display: flex; gap: 1rem; }
+        .lh-card__actions span { display: flex; align-items: center; gap: 4px; }
+        .lh-nav-profile {
+            display: flex; align-items: center; justify-content: center;
+            width: 38px; height: 38px; border-radius: 50%;
+            color: var(--color-nav-text); text-decoration: none;
+            transition: background 0.15s;
+        }
+        .lh-nav-profile:hover { background: var(--color-nav-hover); color: #000; }
+        .lh-home-layout {
+            width: 76%; max-width: 1120px; margin: 0 auto;
+            display: grid; grid-template-columns: minmax(0, 1fr) 280px;
+            gap: 1.25rem; align-items: start;
+        }
+        .lh-home-feed { display: flex; flex-direction: column; gap: 1.25rem; min-width: 0; }
+        .lh-home-sidebar { display: flex; flex-direction: column; gap: 1rem; position: sticky; top: 96px; }
+        .lh-home-intro { display: flex; align-items: center; justify-content: space-between; gap: 1rem; }
+        .lh-home-nav { display: flex; align-items: center; flex-wrap: wrap; gap: 0.45rem; justify-content: flex-end; }
+        .lh-home-nav a, .lh-side-nav a {
+            display: flex; align-items: center; gap: 6px;
+            color: var(--color-text); text-decoration: none; font-size: 0.85rem; font-weight: 700;
+            background: var(--color-tag-bg); border-radius: 999px; padding: 7px 11px;
+        }
+        .lh-home-nav a:hover, .lh-side-nav a:hover { background: #E5E7EB; }
+        .lh-profile-shortcut {
+            display: flex; align-items: center; gap: 0.85rem;
+            color: inherit; text-decoration: none; padding: 1.1rem 1.2rem;
+        }
+        .lh-profile-shortcut:hover { color: inherit; text-decoration: none; }
+        .lh-home-stats { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.75rem; }
+        .lh-home-stats div {
+            border: 1px solid var(--color-border); border-radius: 10px;
+            padding: 0.8rem; background: #FAFAFA;
+        }
+        .lh-home-stats strong { display: block; font-size: 1.45rem; line-height: 1; font-weight: 900; }
+        .lh-home-stats span {
+            display: block; margin-top: 4px; color: var(--color-muted);
+            font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.06em; font-weight: 700;
+        }
+        .lh-side-nav { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+        .lh-profile-hero {
+            display: flex; align-items: center; gap: 1.5rem;
+        }
+        .lh-profile-stats {
+            margin-left: auto; display: flex; gap: 2rem; text-align: center;
+        }
+        .lh-profile-stats strong { display: block; font-size: 1.5rem; line-height: 1; font-weight: 900; }
+        .lh-profile-stats span {
+            display: block; margin-top: 5px; color: var(--color-muted);
+            font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.06em; font-weight: 700;
+        }
+        .lh-people-list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.75rem; }
+        .lh-person-link {
+            display: flex; align-items: center; gap: 0.6rem;
+            color: inherit; text-decoration: none; border: 1px solid var(--color-border);
+            border-radius: 10px; padding: 0.75rem; background: #FAFAFA;
+        }
+        .lh-person-link:hover { color: inherit; background: #F3F4F6; text-decoration: none; }
+        /* ── STAT CARDS ──────────────────────── */
+        .lh-stats { display: flex; gap: 1rem; margin-bottom: 2rem; }
+        .lh-stat-card {
+            flex: 1; background: #fff; border-radius: 12px;
+            padding: 1.2rem 1.5rem; text-align: center;
+            border: 1px solid var(--color-border);
+            box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+        }
+        .lh-stat-card__num { font-size: 2.1rem; font-weight: 900; color: var(--color-text); line-height: 1; }
+        .lh-stat-card__label { font-size: 0.72rem; color: var(--color-muted); text-transform: uppercase; letter-spacing: 0.08em; font-weight: 600; margin-top: 4px; }
+        /* ── SECTION HEADER ──────────────────── */
+        .lh-section-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.25rem; }
+        .lh-section-title { font-size: 1.05rem; font-weight: 800; letter-spacing: 0; margin: 0; }
+        .lh-section-link { font-size: 0.82rem; color: var(--color-muted); text-decoration: none; }
+        .lh-section-link:hover { color: var(--color-text); text-decoration: underline; }
+        /* ── BREADCRUMBS ─────────────────────── */
+        .lh-breadcrumbs { font-size: 0.8rem; color: var(--color-muted); margin-bottom: 1.5rem; }
+        .lh-breadcrumbs a { color: var(--color-muted); text-decoration: none; }
+        .lh-breadcrumbs a:hover { text-decoration: underline; }
+        .lh-breadcrumbs span { margin: 0 5px; }
+        /* ── FOOTER ──────────────────────────── */
+        .lh-footer {
+            text-align: center; padding: 1rem 2rem;
+            font-size: 0.8rem; color: var(--color-muted);
+            border-top: 1px solid var(--color-border); background: #fff; height: 56px;
+            display: flex; align-items: center; justify-content: center;
+        }
+        /* ── TABLE (za Details) ───────────────── */
+        .lh-table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
+        .lh-table th, .lh-table td { padding: 10px 14px; text-align: left; border-bottom: 1px solid var(--color-border); }
+        .lh-table th { font-weight: 700; color: var(--color-muted); font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.06em; }
+        .lh-table tr:last-child td { border-bottom: none; }
+        .lh-table tr:hover td { background: #FAFAFA; }
+        /* ── RESPONSIVE ──────────────────────── */
+        @@media (max-width: 900px) {
+            .lh-feed-wrapper { width: 92%; }
+            .lh-home-layout { width: 92%; grid-template-columns: 1fr; }
+            .lh-home-sidebar { position: static; }
+            .lh-stats { flex-wrap: wrap; }
+        }
+        @@media (max-width: 640px) {
+            .lh-navbar { padding: 0 1rem; }
+            .lh-brand { font-size: 1.15rem; }
+            .lh-nav-link span { display: none; }
+            .lh-feed-wrapper { width: 100%; padding: 0 0.75rem; }
+            .lh-home-layout { width: 100%; padding: 0 0.75rem; }
+            .lh-home-intro { align-items: flex-start; flex-direction: column; }
+            .lh-home-nav { justify-content: flex-start; }
+            .lh-card__footer { align-items: flex-start; flex-direction: column; gap: 0.75rem; }
+            .lh-profile-hero { align-items: flex-start; flex-direction: column; }
+            .lh-profile-stats { margin-left: 0; width: 100%; justify-content: space-between; gap: 1rem; }
+            .lh-people-list { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    @{
+        var currentUserId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+    }
+    <nav class="lh-navbar">
+        <div class="lh-nav-left">
+            <a class="lh-nav-link" asp-controller="Home" asp-action="Index">
+                <i class="fas fa-house"></i><span>Feed</span>
+            </a>
+            @if (User.Identity?.IsAuthenticated == true)
+            {
+                <a class="lh-nav-link lh-nav-link--primary" asp-controller="Posts" asp-action="Create">
+                    <i class="fas fa-plus"></i><span>New Post</span>
+                </a>
+                <a class="lh-nav-link" asp-controller="Notifications" asp-action="Index">
+                    <i class="fas fa-bell"></i><span>Notifications</span>
+                </a>
+                @if (User.IsInRole("Admin") || User.IsInRole("Manager"))
+                {
+                    <div class="lh-dropdown">
+                        <button class="lh-dropdown-toggle">
+                            <i class="fas fa-cog"></i><span>Admin</span>
+                            <i class="fas fa-chevron-down" style="font-size:0.7rem;margin-top:2px;"></i>
+                        </button>
+                        <ul class="lh-dropdown-menu">
+                            <li><a asp-controller="Users" asp-action="Index"><i class="fas fa-users" style="width:16px;"></i> Users</a></li>
+                            <li><a asp-controller="Posts" asp-action="Index"><i class="fas fa-newspaper" style="width:16px;"></i> Posts</a></li>
+                            <li><a asp-controller="Comments" asp-action="Index"><i class="fas fa-comments" style="width:16px;"></i> Comments</a></li>
+                            <li><a asp-controller="Follows" asp-action="Index"><i class="fas fa-link" style="width:16px;"></i> Follows</a></li>
+                            <li><a asp-controller="Likes" asp-action="Index"><i class="fas fa-heart" style="width:16px;"></i> Likes</a></li>
+                            <li><a asp-controller="Messages" asp-action="Index"><i class="fas fa-envelope" style="width:16px;"></i> Messages</a></li>
+                            <li><a asp-controller="Notifications" asp-action="Index"><i class="fas fa-bell" style="width:16px;"></i> Notifications</a></li>
+                            <li><a asp-controller="Reports" asp-action="Index"><i class="fas fa-flag" style="width:16px;"></i> Reports</a></li>
+                            <li><a asp-controller="Tags" asp-action="Index"><i class="fas fa-tags" style="width:16px;"></i> Topics</a></li>
+                        </ul>
+                    </div>
+                }
+            }
+        </div>
+
+        <div class="lh-nav-center">
+            <a asp-controller="Home" asp-action="Index" class="lh-brand">LifeHack4Life</a>
+        </div>
+
+        <div class="lh-nav-right">
+            @if (User.Identity?.IsAuthenticated == true)
+            {
+                @if (!string.IsNullOrWhiteSpace(currentUserId))
+                {
+                    <a class="lh-nav-profile" 
+                       asp-controller="Users" 
+                       asp-action="Details" 
+                       asp-route-id="@currentUserId"
+                       data-user-id="@currentUserId"
+                       data-get-images-url="@Url.Action("GetProfileImages", "Users", new { userId = currentUserId })"
+                       aria-label="Profile">
+                        <i class="fas fa-user-circle" style="font-size:1.45rem;"></i>
+                    </a>
+                }
+                <form asp-controller="Auth" asp-action="Logout" method="post" style="margin:0;">
+                    <button class="lh-nav-link" type="submit" style="border:0;background:transparent;">
+                        <i class="fas fa-right-from-bracket"></i><span>Logout</span>
+                    </button>
+                </form>
+            }
+            else
+            {
+                <a class="lh-nav-link" asp-controller="Auth" asp-action="Index">
+                    <i class="fas fa-right-to-bracket"></i><span>Login</span>
+                </a>
+                <a class="lh-nav-link" asp-controller="Auth" asp-action="Index" asp-route-tab="register">
+                    <i class="fas fa-user-plus"></i><span>Register</span>
+                </a>
+            }
+        </div>
+    </nav>
+
+    <main class="lh-main">
+        @if (TempData["Flash"] is string flash)
+        {
+            <div class="lh-feed-wrapper" style="margin-bottom:1rem;">
+                <div class="lh-alert" style="background:#ecfdf5;border-color:#bbf7d0;color:#047857;">
+                    <i class="fas fa-check-circle" style="margin-right:6px;"></i>@flash
+                </div>
+            </div>
+        }
+        @RenderBody()
+    </main>
+
+    <footer class="lh-footer">
+        &copy; 2026 LifeHack4Life &mdash; Filip Radoš
+    </footer>
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    <script>
+        $(function () {
+            LifeHack.initProfileImage();
+        });
+    </script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

@@ -1,0 +1,30 @@
+@model ReportFormModel
+
+<input asp-for="Id" type="hidden" />
+<div asp-validation-summary="ModelOnly" class="lh-validation-summary"></div>
+
+<div class="lh-form-grid">
+    <div class="lh-field">
+        <label asp-for="Reason" class="lh-label">Razlog</label>
+        <select asp-for="Reason" asp-items="Html.GetEnumSelectList<ReportReason>()" class="lh-input">
+            <option value="">- odaberite -</option>
+        </select>
+        <span asp-validation-for="Reason" class="lh-validation"></span>
+    </div>
+    <div class="lh-field">
+        <label asp-for="Status" class="lh-label">Status</label>
+        <select asp-for="Status" asp-items="Html.GetEnumSelectList<ReportStatus>()" class="lh-input">
+            <option value="">- odaberite -</option>
+        </select>
+        <span asp-validation-for="Status" class="lh-validation"></span>
+    </div>
+</div>
+
+<partial name="~/Views/Shared/_DateTimePicker.cshtml"
+         model="@(new DateTimeInputModel { Name = nameof(Model.CreatedAt), Label = "Datum prijave", Value = Model.CreatedAt })" />
+
+<partial name="~/Views/Shared/_Autocomplete.cshtml"
+         model="@(new AutocompleteInputModel { Name = nameof(Model.ReporterId), Label = "Prijavitelj", SearchUrl = Url.Action("Autocomplete", "Users") ?? "", SelectedId = Model.ReporterId, SelectedText = Model.ReporterText, Placeholder = "Pretrazi korisnike..." })" />
+
+<partial name="~/Views/Shared/_Autocomplete.cshtml"
+         model="@(new AutocompleteInputModel { Name = nameof(Model.PostId), Label = "Post", SearchUrl = Url.Action("Autocomplete", "Posts") ?? "", SelectedId = Model.PostId, SelectedText = Model.PostText, Placeholder = "Pretrazi objave..." })" />

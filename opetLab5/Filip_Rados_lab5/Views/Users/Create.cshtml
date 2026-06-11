@@ -1,0 +1,36 @@
+@model UserFormModel
+@{
+    ViewData["Title"] = "Novi korisnik";
+}
+
+<div class="lh-feed-wrapper">
+    <nav class="lh-breadcrumbs">
+        <a asp-action="Index">Korisnici</a><span>/</span><span>Novi korisnik</span>
+    </nav>
+
+    <form asp-action="Create" method="post" enctype="multipart/form-data" class="lh-card lh-form-card">
+        <h2 class="lh-form-title">Novi korisnik</h2>
+        <partial name="_Form" model="Model" />
+        <div class="lh-field">
+            <label for="profileImageFile" class="lh-label">Profilna slika</label>
+            <input id="profileImageFile"
+                   name="profileImageFile"
+                   type="file"
+                   accept="image/jpeg,image/png,image/webp,image/gif"
+                   class="lh-input" />
+            <span class="lh-muted" style="display:block;font-size:0.82rem;margin-top:0.35rem;">
+                Opcionalno. Dopustene su JPG, PNG, WebP ili GIF slike do 5 MB.
+            </span>
+            <span class="lh-validation" data-valmsg-for="profileImageFile" data-valmsg-replace="true"></span>
+        </div>
+        <div class="lh-form-actions">
+            <a class="lh-button lh-button--ghost" asp-action="Index">Odustani</a>
+            <button class="lh-button" type="submit"><i class="fas fa-floppy-disk"></i> Spremi</button>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    @{ await Html.RenderPartialAsync("_ValidationScriptsPartial"); }
+    <script>LifeHack.initForms();</script>
+}

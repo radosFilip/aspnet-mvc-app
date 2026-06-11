@@ -1,0 +1,43 @@
+@model UserFormModel
+
+<input asp-for="Id" type="hidden" />
+<div asp-validation-summary="ModelOnly" class="lh-validation-summary"></div>
+
+<div class="lh-form-grid">
+    <div class="lh-field">
+        <label asp-for="FirstName" class="lh-label">Ime</label>
+        <input asp-for="FirstName" class="lh-input" />
+        <span asp-validation-for="FirstName" class="lh-validation"></span>
+    </div>
+    <div class="lh-field">
+        <label asp-for="LastName" class="lh-label">Prezime</label>
+        <input asp-for="LastName" class="lh-input" />
+        <span asp-validation-for="LastName" class="lh-validation"></span>
+    </div>
+    <div class="lh-field">
+        <label asp-for="Username" class="lh-label">Korisnicko ime</label>
+        <input asp-for="Username" class="lh-input" />
+        <span asp-validation-for="Username" class="lh-validation"></span>
+    </div>
+    <div class="lh-field">
+        <label asp-for="Email" class="lh-label">Email</label>
+        <input asp-for="Email" class="lh-input" />
+        <span asp-validation-for="Email" class="lh-validation"></span>
+    </div>
+</div>
+
+<partial name="~/Views/Shared/_DateTimePicker.cshtml"
+         model="@(new DateTimeInputModel { Name = nameof(Model.DateOfBirth), Label = "Datum rodenja", Value = Model.DateOfBirth })" />
+
+<div class="lh-form-grid">
+    <div class="lh-field">
+        <label asp-for="OIB" class="lh-label">OIB</label>
+        <input asp-for="OIB" class="lh-input" />
+        <span asp-validation-for="OIB" class="lh-validation"></span>
+    </div>
+    <div class="lh-field">
+        <label asp-for="JMBG" class="lh-label">JMBG</label>
+        <input asp-for="JMBG" class="lh-input" />
+        <span asp-validation-for="JMBG" class="lh-validation"></span>
+    </div>
+</div>

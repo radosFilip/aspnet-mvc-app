@@ -1,0 +1,16 @@
+@model LikeFormModel
+@{ ViewData["Title"] = "Novi lajk"; }
+
+<div class="lh-feed-wrapper">
+    <nav class="lh-breadcrumbs"><a asp-action="Index">Lajkovi</a><span>/</span><span>Novi lajk</span></nav>
+    <form asp-action="Create" method="post" class="lh-card lh-form-card">
+        <h2 class="lh-form-title">Novi lajk</h2>
+        <partial name="_Form" model="Model" />
+        <div class="lh-form-actions">
+            <a class="lh-button lh-button--ghost" asp-action="Index">Odustani</a>
+            <button class="lh-button" type="submit"><i class="fas fa-floppy-disk"></i> Spremi</button>
+        </div>
+    </form>
+</div>
+
+@section Scripts { @{ await Html.RenderPartialAsync("_ValidationScriptsPartial"); } <script>LifeHack.initForms();</script> }

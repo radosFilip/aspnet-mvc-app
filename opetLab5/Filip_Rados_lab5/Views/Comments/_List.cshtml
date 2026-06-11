@@ -1,0 +1,42 @@
+@model List<Comment>
+
+<div class="lh-card lh-list-card">
+    <table class="lh-table">
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>Autor</th>
+                <th>Komentar</th>
+                <th>Post</th>
+                <th>Datum</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var comment in Model)
+            {
+                <tr>
+                    <td class="lh-muted">@comment.Id</td>
+                    <td class="lh-strong">
+                        <a asp-controller="Users" asp-action="Details" asp-route-id="@comment.AuthorId">
+                            <i class="fas fa-user-circle"></i> @comment.Author?.Username
+                        </a>
+                    </td>
+                    <td>@comment.Content</td>
+                    <td><a asp-controller="Posts" asp-action="Details" asp-route-id="@comment.PostId">@comment.Post?.Title</a></td>
+                    <td class="lh-muted">@comment.CreatedAt.ToString("g")</td>
+                    <td class="lh-row-actions">
+                        <a asp-action="Details" asp-route-id="@comment.Id">Detalji</a>
+                        <a asp-action="Edit" asp-route-id="@comment.Id">Uredi</a>
+                        <a asp-action="Delete" asp-route-id="@comment.Id">Obrisi</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    @if (!Model.Any())
+    {
+        <div class="lh-empty-state"><i class="fas fa-inbox"></i>Nema komentara za zadani upit.</div>
+    }
+</div>

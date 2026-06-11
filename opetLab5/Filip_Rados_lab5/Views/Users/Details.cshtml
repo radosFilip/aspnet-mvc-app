@@ -1,0 +1,115 @@
+@model Filip_Rados_lab5.Models.User
+@{
+    ViewData["Title"] = Model.Username;
+    var posts = ViewBag.Posts as List<Filip_Rados_lab5.Models.Post> ?? new();
+    var following = ViewBag.Following as List<Filip_Rados_lab5.Models.User> ?? new();
+    var followers = ViewBag.Followers as List<Filip_Rados_lab5.Models.User> ?? new();
+    var profileImage = Model.ProfileImages?
+        .OrderByDescending(image => image.CreatedAt)
+        .FirstOrDefault();
+    var currentUserId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+    var canManageProfile = User.IsInRole("Admin") || Model.Id.ToString() == currentUserId;
+}
+
+<div class="lh-feed-wrapper">
+    <nav class="lh-breadcrumbs">
+        <a asp-controller="Home" asp-action="Index">Feed</a>
+        <span>/</span>
+        <span>Profil</span>
+        <span>/</span>
+        <span>@@@Model.Username</span>
+    </nav>
+
+    <section class="lh-card lh-profile-hero">
+        @if (profileImage != null)
+        {
+            <img src="@profileImage.FilePath"
+                 alt="@Model.Username"
+                 style="width:72px;height:72px;border-radius:50%;object-fit:cover;flex-shrink:0;border:2px solid var(--color-border);" />
+        }
+        else
+        {
+            <i class="fas fa-user-circle" style="font-size:4rem;color:var(--color-muted);flex-shrink:0;"></i>
+        }
+        <div>
+            <h1 style="font-size:1.6rem;font-weight:900;margin:0 0 0.25rem;">@Model.FirstName @Model.LastName</h1>
+            <div style="color:var(--color-muted);font-size:0.95rem;">@@@Model.Username</div>
+            <div style="color:var(--color-muted);font-size:0.85rem;margin-top:4px;">@Model.Email</div>
+            @if (canManageProfile)
+            {
+                <a asp-action="Edit" asp-route-id="@Model.Id"
+                   style="display:inline-flex;margin-top:0.6rem;color:inherit;text-decoration:none;font-weight:700;">
+                    <i class="fas fa-pen-to-square" style="margin-right:6px;"></i>Uredi profil
+                </a>
+            }
+        </div>
+        <div class="lh-profile-stats">
+            <div><strong>@posts.Count</strong><span>Postovi</span></div>
+            <div><strong>@followers.Count</strong><span>Pratitelji</span></div>
+            <div><strong>@following.Count</strong><span>Prati</span></div>
+        </div>
+    </section>
+
+    <div class="lh-section-header" style="margin-bottom:0;">
+        <h2 class="lh-section-title">Objave korisnika</h2>
+    </div>
+
+    @foreach (var post in posts.OrderByDescending(p => p.CreatedAt))
+    {
+        var likeCount = post.Likes?.Count ?? 0;
+        var commentCount = post.Comments?.Count ?? 0;
+        var excerpt = string.IsNullOrWhiteSpace(post.Content)
+            ? "Nema opisa."
+            : post.Content.Length > 160
+                ? post.Content.Substring(0, 160) + "..."
+                : post.Content;
+
+        <article class="lh-card">
+            <div class="lh-card__meta">
+                <a asp-controller="Posts" asp-action="Index" asp-route-category="@post.Category.ToString()"
+                   class="lh-card__category" style="text-decoration:none;">@post.Category</a>
+                <span class="lh-card__date">@post.CreatedAt.ToString("dd. MMM yyyy.")</span>
+            </div>
+
+            <h3 class="lh-card__title">
+                <a asp-controller="Posts" asp-action="Details" asp-route-id="@post.Id">@post.Title</a>
+            </h3>
+
+            <p class="lh-card__excerpt">@excerpt</p>
+
+            @if (post.Tags != null && post.Tags.Any())
+            {
+                <div class="lh-card__tags">
+                    @foreach (var tag in post.Tags)
+                    {
+                        <a asp-controller="Tags" asp-action="Details" asp-route-id="@tag.Id" class="lh-tag"
+                           style="text-decoration:none;">#@tag.Name</a>
+                    }
+                </div>
+            }
+
+            <div class="lh-card__footer">
+                <div class="lh-card__author">
+                    <i class="fas fa-user-circle" style="font-size:1.1rem;"></i>
+                    <span>@@@Model.Username</span>
+                </div>
+                <div class="lh-card__actions">
+                    <span><i class="fas fa-heart"></i> @likeCount</span>
+                    <span><i class="fas fa-comment"></i> @commentCount</span>
+                    <a asp-controller="Posts" asp-action="Details" asp-route-id="@post.Id"
+                       style="color:inherit;text-decoration:none;font-weight:600;">
+                        Čitaj <i class="fas fa-arrow-right" style="font-size:0.7rem;"></i>
+                    </a>
+                </div>
+            </div>
+        </article>
+    }
+
+    @if (!posts.Any())
+    {
+        <div class="lh-card" style="text-align:center;padding:3rem;color:var(--color-muted);">
+            <i class="fas fa-inbox" style="font-size:2rem;margin-bottom:1rem;display:block;"></i>
+            Korisnik nema objavljenih postova.
+        </div>
+    }
+</div>

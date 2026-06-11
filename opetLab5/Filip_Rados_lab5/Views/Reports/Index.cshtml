@@ -1,0 +1,30 @@
+@model List<Report>
+@{
+    ViewData["Title"] = "Prijave";
+    var query = ViewBag.Query as string;
+}
+
+<div class="lh-feed-wrapper">
+    <div class="lh-section-header">
+        <h2 class="lh-section-title">Prijave <span data-result-count>(@Model.Count)</span></h2>
+        <a class="lh-button" asp-action="Create"><i class="fas fa-plus"></i> Nova prijava</a>
+    </div>
+
+    <div class="lh-toolbar">
+        <i class="fas fa-magnifying-glass"></i>
+        <input class="lh-search-input"
+               value="@query"
+               placeholder="Pretrazi prijave..."
+               data-ajax-search
+               data-search-url="@Url.Action("Search", "Reports")"
+               data-target="#reports-list" />
+    </div>
+
+    <div id="reports-list" data-list-shell>
+        <partial name="_List" model="Model" />
+    </div>
+</div>
+
+@section Scripts {
+    <script>LifeHack.initAjaxSearch();</script>
+}

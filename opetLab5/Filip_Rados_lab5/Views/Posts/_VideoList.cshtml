@@ -1,0 +1,43 @@
+@model List<Filip_Rados_lab5.Models.PostVideo>
+
+@functions {
+    private static string FormatFileSize(long bytes)
+    {
+        if (bytes >= 1024 * 1024) return $"{bytes / 1024d / 1024d:0.0} MB";
+        if (bytes >= 1024) return $"{bytes / 1024d:0.0} KB";
+        return $"{bytes} B";
+    }
+}
+
+@if (!Model.Any())
+{
+    <div class="lh-empty-state" style="padding:1.25rem;">
+        <i class="fas fa-video"></i>
+        Nema spremljenih videozapisa.
+    </div>
+}
+else
+{
+    <div style="display:flex;flex-direction:column;gap:1rem;">
+        @foreach (var video in Model)
+        {
+            <div style="border:1px solid var(--color-border);border-radius:10px;padding:0.9rem;background:#FAFAFA;">
+                <video controls preload="metadata" src="@video.FilePath" style="width:100%;max-height:320px;border-radius:8px;background:#111;"></video>
+                <div style="display:flex;align-items:center;justify-content:space-between;gap:1rem;margin-top:0.75rem;">
+                    <div style="min-width:0;">
+                        <div style="font-weight:800;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">@video.FileName</div>
+                        <div style="font-size:0.8rem;color:var(--color-muted);">
+                            @FormatFileSize(video.FileSize) · @video.CreatedAt.ToLocalTime().ToString("g")
+                        </div>
+                    </div>
+                    <button type="button"
+                            class="lh-button lh-button--ghost"
+                            data-media-delete
+                            data-delete-url="@Url.Action("DeleteVideo", "Posts", new { id = video.Id })">
+                        <i class="fas fa-trash"></i> Obrisi
+                    </button>
+                </div>
+            </div>
+        }
+    </div>
+}

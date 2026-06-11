@@ -1,0 +1,51 @@
+@model UserFormModel
+@{
+    ViewData["Title"] = "Uredi korisnika";
+}
+
+<div class="lh-feed-wrapper">
+    <nav class="lh-breadcrumbs">
+        <a asp-action="Index">Korisnici</a><span>/</span><span>Uredi</span>
+    </nav>
+
+    <form asp-action="Edit" method="post" class="lh-card lh-form-card" enctype="multipart/form-data">
+        <h2 class="lh-form-title">Uredi korisnika</h2>
+        <partial name="_Form" model="Model" />
+        <div class="lh-form-actions">
+            <a class="lh-button lh-button--ghost" asp-action="Index">Odustani</a>
+            <button class="lh-button" type="submit"><i class="fas fa-floppy-disk"></i> Spremi</button>
+        </div>
+    </form>
+
+    <section class="lh-card">
+        <div class="lh-section-header" style="margin-bottom:1rem;">
+            <h2 class="lh-section-title"><i class="fas fa-image" style="margin-right:6px;"></i> Profilna slika</h2>
+        </div>
+
+        <div data-media-upload
+             data-upload-url="@Url.Action("UploadProfileImage", "Users", new { userId = Model.Id })"
+             data-list-url="@Url.Action("GetProfileImages", "Users", new { userId = Model.Id })"
+             data-redirect-url="@Url.Action("Details", "Users", new { id = Model.Id })"
+             data-target="#profileImageList"
+             data-accept="image/jpeg,image/png,image/webp,image/gif"
+             style="border:2px dashed var(--color-border);border-radius:10px;padding:1.25rem;text-align:center;background:#FAFAFA;cursor:pointer;user-select:none;transition:all 0.2s;"
+             onmouseover="this.style.background='#F0F0F0';this.style.borderColor='var(--color-nav-bg)'"
+             onmouseout="this.style.background='#FAFAFA';this.style.borderColor='var(--color-border)'">
+            @Html.AntiForgeryToken()
+            <i class="fas fa-cloud-arrow-up" style="font-size:1.8rem;color:var(--color-muted);display:block;margin-bottom:0.5rem;"></i>
+            <div style="font-weight:800;">Povucite sliku ovdje ili kliknite za odabir</div>
+            <div style="font-size:0.82rem;color:var(--color-muted);margin-top:0.25rem;">JPG, PNG, WebP ili GIF do 5 MB</div>
+            <div data-media-status style="font-size:0.82rem;color:var(--color-muted);margin-top:0.75rem;"></div>
+        </div>
+
+        <div id="profileImageList" style="margin-top:1rem;"></div>
+    </section>
+</div>
+
+@section Scripts {
+    @{ await Html.RenderPartialAsync("_ValidationScriptsPartial"); }
+    <script>
+        LifeHack.initForms();
+        LifeHack.initMediaUploads();
+    </script>
+}

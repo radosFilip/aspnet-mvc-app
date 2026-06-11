@@ -1,0 +1,143 @@
+@model AuthPageViewModel
+@{
+    ViewData["Title"] = "Login";
+    var showRegister = Model.ActiveTab == "register";
+}
+
+<div class="lh-feed-wrapper">
+    <section class="lh-card lh-form-card">
+        <div class="lh-section-header" style="margin-bottom:1.2rem;">
+            <h1 class="lh-form-title" style="margin:0;">Account</h1>
+        </div>
+
+        <div style="display:flex;gap:0.75rem;margin-bottom:1.25rem;font-size:0.9rem;">
+            <a asp-action="Index" asp-route-tab="login"
+               style="font-weight:@(showRegister ? "600" : "800");color:inherit;text-decoration:@(showRegister ? "none" : "underline");">Login</a>
+            <span style="color:var(--color-muted);">/</span>
+            <a asp-action="Index" asp-route-tab="register"
+               style="font-weight:@(showRegister ? "800" : "600");color:inherit;text-decoration:@(showRegister ? "underline" : "none");">Register</a>
+        </div>
+
+        @if (!showRegister)
+        {
+            <form asp-action="Login" method="post">
+                <input type="hidden" asp-for="ActiveTab" value="login" />
+                <div asp-validation-summary="ModelOnly" class="lh-validation-summary"></div>
+
+                <div class="lh-field">
+                    <label asp-for="Login.UsernameOrEmail" class="lh-label">Username or email</label>
+                    <input asp-for="Login.UsernameOrEmail" class="lh-input" autocomplete="username" />
+                    <span asp-validation-for="Login.UsernameOrEmail" class="lh-validation"></span>
+                </div>
+
+                <div class="lh-field">
+                    <label asp-for="Login.Password" class="lh-label">Password</label>
+                    <input asp-for="Login.Password" class="lh-input" autocomplete="current-password" />
+                    <span asp-validation-for="Login.Password" class="lh-validation"></span>
+                </div>
+
+                <label class="lh-check" style="margin-bottom:1rem;">
+                    <input asp-for="Login.RememberMe" />
+                    <span>Remember me</span>
+                </label>
+
+                <div class="lh-form-actions">
+                    <a class="lh-button lh-button--ghost" asp-controller="Home" asp-action="Index">Cancel</a>
+                    <button class="lh-button" type="submit">Sign in</button>
+                </div>
+            </form>
+
+            <div style="display:flex;align-items:center;gap:0.75rem;margin:1.2rem 0;color:var(--color-muted);font-size:0.82rem;">
+                <span style="height:1px;background:var(--color-border);flex:1;"></span>
+                <span>or</span>
+                <span style="height:1px;background:var(--color-border);flex:1;"></span>
+            </div>
+
+            <form asp-action="ExternalLogin" method="post">
+                <input type="hidden" name="provider" value="Google" />
+                <button class="lh-button lh-button--ghost" type="submit" style="width:100%;justify-content:center;">
+                    <i class="fab fa-google"></i> Sign in with Google
+                </button>
+            </form>
+
+            <form asp-action="ExternalLogin" method="post" style="margin-top:0.65rem;">
+                <input type="hidden" name="provider" value="Facebook" />
+                <button class="lh-button lh-button--ghost" type="submit" style="width:100%;justify-content:center;">
+                    <i class="fab fa-facebook"></i> Sign in with Facebook
+                </button>
+            </form>
+        }
+        else
+        {
+            <form asp-action="Register" method="post">
+                <input type="hidden" asp-for="ActiveTab" value="register" />
+                <div asp-validation-summary="ModelOnly" class="lh-validation-summary"></div>
+
+                <div class="lh-form-grid">
+                    <div class="lh-field">
+                        <label asp-for="Register.FirstName" class="lh-label">First name</label>
+                        <input asp-for="Register.FirstName" class="lh-input" autocomplete="given-name" />
+                        <span asp-validation-for="Register.FirstName" class="lh-validation"></span>
+                    </div>
+                    <div class="lh-field">
+                        <label asp-for="Register.LastName" class="lh-label">Last name</label>
+                        <input asp-for="Register.LastName" class="lh-input" autocomplete="family-name" />
+                        <span asp-validation-for="Register.LastName" class="lh-validation"></span>
+                    </div>
+                </div>
+
+                <div class="lh-form-grid">
+                    <div class="lh-field">
+                        <label asp-for="Register.Username" class="lh-label">Username</label>
+                        <input asp-for="Register.Username" class="lh-input" autocomplete="username" />
+                        <span asp-validation-for="Register.Username" class="lh-validation"></span>
+                    </div>
+                    <div class="lh-field">
+                        <label asp-for="Register.Email" class="lh-label">Email</label>
+                        <input asp-for="Register.Email" class="lh-input" autocomplete="email" />
+                        <span asp-validation-for="Register.Email" class="lh-validation"></span>
+                    </div>
+                </div>
+
+                <partial name="~/Views/Shared/_DateTimePicker.cshtml"
+                         model='@(new DateTimeInputModel { Name = "Register.DateOfBirth", Label = "Date of birth", Value = Model.Register.DateOfBirth })' />
+
+                <div class="lh-form-grid">
+                    <div class="lh-field">
+                        <label asp-for="Register.OIB" class="lh-label">OIB</label>
+                        <input asp-for="Register.OIB" class="lh-input" />
+                        <span asp-validation-for="Register.OIB" class="lh-validation"></span>
+                    </div>
+                    <div class="lh-field">
+                        <label asp-for="Register.JMBG" class="lh-label">JMBG</label>
+                        <input asp-for="Register.JMBG" class="lh-input" />
+                        <span asp-validation-for="Register.JMBG" class="lh-validation"></span>
+                    </div>
+                </div>
+
+                <div class="lh-form-grid">
+                    <div class="lh-field">
+                        <label asp-for="Register.Password" class="lh-label">Password</label>
+                        <input asp-for="Register.Password" class="lh-input" autocomplete="new-password" />
+                        <span asp-validation-for="Register.Password" class="lh-validation"></span>
+                    </div>
+                    <div class="lh-field">
+                        <label asp-for="Register.ConfirmPassword" class="lh-label">Confirm password</label>
+                        <input asp-for="Register.ConfirmPassword" class="lh-input" autocomplete="new-password" />
+                        <span asp-validation-for="Register.ConfirmPassword" class="lh-validation"></span>
+                    </div>
+                </div>
+
+                <div class="lh-form-actions">
+                    <a class="lh-button lh-button--ghost" asp-controller="Home" asp-action="Index">Cancel</a>
+                    <button class="lh-button" type="submit">Register</button>
+                </div>
+            </form>
+        }
+    </section>
+</div>
+
+@section Scripts {
+    @{ await Html.RenderPartialAsync("_ValidationScriptsPartial"); }
+    <script>LifeHack.initForms();</script>
+}

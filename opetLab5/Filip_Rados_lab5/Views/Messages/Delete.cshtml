@@ -1,0 +1,19 @@
+@model Message
+@{
+    ViewData["Title"] = "Obrisi poruku";
+}
+
+<div class="lh-feed-wrapper">
+    <nav class="lh-breadcrumbs">
+        <a asp-action="Index">Poruke</a><span>/</span><span>Brisanje</span>
+    </nav>
+
+    <form asp-action="Delete" method="post" class="lh-card lh-form-card">
+        <h2 class="lh-form-title">Obrisati poruku?</h2>
+        <p>@Model.Content</p>
+        <div class="lh-form-actions">
+            <a class="lh-button lh-button--ghost" asp-action="Index">Odustani</a>
+            <button class="lh-button lh-button--danger" type="submit"><i class="fas fa-trash"></i> Obrisi</button>
+        </div>
+    </form>
+</div>

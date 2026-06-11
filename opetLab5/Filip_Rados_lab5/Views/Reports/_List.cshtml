@@ -1,0 +1,40 @@
+@model List<Report>
+
+<div class="lh-card lh-list-card">
+    <table class="lh-table">
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>Reporter</th>
+                <th>Post</th>
+                <th>Razlog</th>
+                <th>Status</th>
+                <th>Datum</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var report in Model)
+            {
+                <tr>
+                    <td class="lh-muted">@report.Id</td>
+                    <td class="lh-strong"><a asp-controller="Users" asp-action="Details" asp-route-id="@report.ReporterId">@report.Reporter?.Username</a></td>
+                    <td><a asp-controller="Posts" asp-action="Details" asp-route-id="@report.PostId">@report.Post?.Title</a></td>
+                    <td>@report.Reason</td>
+                    <td><span class="lh-status">@report.Status</span></td>
+                    <td class="lh-muted">@report.CreatedAt.ToString("g")</td>
+                    <td class="lh-row-actions">
+                        <a asp-action="Details" asp-route-id="@report.Id">Detalji</a>
+                        <a asp-action="Edit" asp-route-id="@report.Id">Uredi</a>
+                        <a asp-action="Delete" asp-route-id="@report.Id">Obrisi</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    @if (!Model.Any())
+    {
+        <div class="lh-empty-state"><i class="fas fa-inbox"></i>Nema prijava za zadani upit.</div>
+    }
+</div>

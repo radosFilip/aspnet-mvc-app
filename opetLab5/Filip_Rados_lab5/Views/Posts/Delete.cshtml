@@ -1,0 +1,20 @@
+@model Post
+@{
+    ViewData["Title"] = "Obrisi objavu";
+}
+
+<div class="lh-feed-wrapper">
+    <nav class="lh-breadcrumbs">
+        <a asp-action="Index">Objave</a><span>/</span><span>Brisanje</span>
+    </nav>
+
+    <form asp-action="Delete" method="post" class="lh-card lh-form-card">
+        <h2 class="lh-form-title">Obrisati objavu?</h2>
+        <p><strong>@Model.Title</strong></p>
+        <p class="lh-muted">Brisanjem objave brisu se i povezani komentari, lajkovi i prijave.</p>
+        <div class="lh-form-actions">
+            <a class="lh-button lh-button--ghost" asp-action="Index">Odustani</a>
+            <button class="lh-button lh-button--danger" type="submit"><i class="fas fa-trash"></i> Obrisi</button>
+        </div>
+    </form>
+</div>

@@ -1,0 +1,10 @@
+@model TagFormModel
+
+<input asp-for="Id" type="hidden" />
+<div asp-validation-summary="ModelOnly" class="lh-validation-summary"></div>
+
+<div class="lh-field">
+    <label asp-for="Name" class="lh-label">Naziv</label>
+    <input asp-for="Name" class="lh-input" />
+    <span asp-validation-for="Name" class="lh-validation"></span>
+</div>

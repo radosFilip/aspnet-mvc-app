@@ -1,0 +1,36 @@
+@model PostFormModel
+@{
+    ViewData["Title"] = "New post";
+}
+
+<div class="lh-feed-wrapper">
+    <nav class="lh-breadcrumbs">
+        <a asp-action="Index">Posts</a><span>/</span><span>New post</span>
+    </nav>
+
+    <form asp-action="Create" method="post" enctype="multipart/form-data" class="lh-card lh-form-card">
+        <h2 class="lh-form-title">New post</h2>
+        <partial name="_Form" model="Model" />
+        <div class="lh-field">
+            <label for="videoFile" class="lh-label">Video</label>
+            <input id="videoFile"
+                   name="videoFile"
+                   type="file"
+                   accept="video/mp4,video/webm,video/quicktime,video/x-m4v"
+                   class="lh-input" />
+            <span class="lh-muted" style="display:block;font-size:0.82rem;margin-top:0.35rem;">
+                Optional. MP4, WebM, MOV, or M4V videos up to 100 MB are allowed.
+            </span>
+            <span class="lh-validation" data-valmsg-for="videoFile" data-valmsg-replace="true"></span>
+        </div>
+        <div class="lh-form-actions">
+            <a class="lh-button lh-button--ghost" asp-action="Index">Cancel</a>
+            <button class="lh-button" type="submit"><i class="fas fa-floppy-disk"></i> Save</button>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    @{ await Html.RenderPartialAsync("_ValidationScriptsPartial"); }
+    <script>LifeHack.initForms();</script>
+}

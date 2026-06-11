@@ -1,0 +1,30 @@
+@model List<Notification>
+
+<div class="lh-card lh-list-card">
+    <table class="lh-table">
+        <thead><tr><th>#</th><th>Recipient</th><th>Message</th><th>Date</th><th></th></tr></thead>
+        <tbody>
+            @foreach (var notification in Model)
+            {
+                <tr>
+                    <td class="lh-muted">@notification.Id</td>
+                    <td class="lh-strong"><a asp-controller="Users" asp-action="Details" asp-route-id="@notification.RecipientId">@notification.Recipient?.Username</a></td>
+                    <td>@notification.Message</td>
+                    <td class="lh-muted">@notification.CreatedAt.ToString("g")</td>
+                    <td class="lh-row-actions">
+                        <a asp-action="Details" asp-route-id="@notification.Id">Details</a>
+                        @if (User.IsInRole("Admin"))
+                        {
+                            <a asp-action="Edit" asp-route-id="@notification.Id">Edit</a>
+                            <a asp-action="Delete" asp-route-id="@notification.Id">Delete</a>
+                        }
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+    @if (!Model.Any())
+    {
+        <div class="lh-empty-state"><i class="fas fa-inbox"></i>No notifications found.</div>
+    }
+</div>

@@ -1,0 +1,33 @@
+@model Filip_Rados_lab5.ViewModels.DateTimeInputModel
+@{
+    var hiddenId = Model.Name.Replace(".", "_");
+    var displayId = $"{hiddenId}_display";
+    var requiredMessage = $"{Model.Label} je obvezno polje.";
+    var isoValue = Model.Value?.ToString("yyyy-MM-ddTHH:mm:ss");
+}
+
+<div class="lh-field lh-datetime"
+     data-datetime
+     data-target="#@hiddenId">
+    <label class="lh-label" for="@displayId">@Model.Label</label>
+    <div class="lh-datetime__grid">
+        <input id="@displayId"
+               type="text"
+               class="lh-input"
+               autocomplete="off"
+               inputmode="numeric"
+               placeholder="dd.mm.yyyy. HH:mm"
+               data-datetime-display />
+        <button type="button" class="lh-icon-button" data-datetime-now aria-label="Postavi trenutno vrijeme">
+            <i class="fas fa-clock"></i>
+        </button>
+    </div>
+    <input id="@hiddenId"
+           type="hidden"
+           name="@Model.Name"
+           value="@isoValue"
+           data-datetime-value
+           data-val="@(Model.Required ? "true" : null)"
+           data-val-required="@(Model.Required ? requiredMessage : null)" />
+    <span class="lh-validation" data-valmsg-for="@Model.Name" data-valmsg-replace="true"></span>
+</div>

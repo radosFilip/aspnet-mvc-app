@@ -1,0 +1,19 @@
+@model Report
+@{
+    ViewData["Title"] = "Obrisi prijavu";
+}
+
+<div class="lh-feed-wrapper">
+    <nav class="lh-breadcrumbs">
+        <a asp-action="Index">Prijave</a><span>/</span><span>Brisanje</span>
+    </nav>
+
+    <form asp-action="Delete" method="post" class="lh-card lh-form-card">
+        <h2 class="lh-form-title">Obrisati prijavu?</h2>
+        <p>Prijava za post <strong>@Model.Post?.Title</strong> zbog razloga <strong>@Model.Reason</strong>.</p>
+        <div class="lh-form-actions">
+            <a class="lh-button lh-button--ghost" asp-action="Index">Odustani</a>
+            <button class="lh-button lh-button--danger" type="submit"><i class="fas fa-trash"></i> Obrisi</button>
+        </div>
+    </form>
+</div>

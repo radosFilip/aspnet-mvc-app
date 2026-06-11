@@ -1,0 +1,38 @@
+@model List<Post>
+@{
+    ViewData["Title"] = "Posts";
+    var activeCategory = ViewBag.ActiveCategory as string;
+    var query = ViewBag.Query as string;
+}
+
+<div class="lh-feed-wrapper">
+    <div class="lh-section-header">
+        <h2 class="lh-section-title">
+            @(string.IsNullOrEmpty(activeCategory) ? "All posts" : $"Category: {activeCategory}")
+            <span data-result-count>(@Model.Count)</span>
+        </h2>
+        <a class="lh-button" asp-action="Create"><i class="fas fa-plus"></i> New post</a>
+    </div>
+
+    <div class="lh-toolbar">
+        <i class="fas fa-magnifying-glass"></i>
+        <input class="lh-search-input"
+               value="@query"
+               placeholder="Search posts, authors, or tags..."
+               data-ajax-search
+               data-search-url="@Url.Action("Search", "Posts", new { category = activeCategory })"
+               data-target="#posts-list" />
+        @if (!string.IsNullOrEmpty(activeCategory))
+        {
+            <a class="lh-button lh-button--ghost" asp-action="Index">Clear filter</a>
+        }
+    </div>
+
+    <div id="posts-list" data-list-shell>
+        <partial name="_List" model="Model" />
+    </div>
+</div>
+
+@section Scripts {
+    <script>LifeHack.initAjaxSearch();</script>
+}

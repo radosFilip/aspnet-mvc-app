@@ -1,0 +1,34 @@
+@model Filip_Rados_lab5.ViewModels.AutocompleteInputModel
+@{
+    var inputId = $"{Model.Name.Replace(".", "_")}_lookup";
+    var hiddenId = Model.Name.Replace(".", "_");
+    var requiredMessage = $"{Model.Label} je obvezno polje.";
+}
+
+<div class="lh-field lh-autocomplete"
+     data-autocomplete
+     data-search-url="@Model.SearchUrl">
+    <label class="lh-label" for="@inputId">@Model.Label</label>
+    <div class="lh-autocomplete__box">
+        <input id="@inputId"
+               type="text"
+               class="lh-input"
+               autocomplete="off"
+               placeholder="@Model.Placeholder"
+               value="@Model.SelectedText"
+               data-autocomplete-display
+               data-selected-text="@Model.SelectedText" />
+        <input id="@hiddenId"
+               type="hidden"
+               name="@Model.Name"
+               value="@Model.SelectedId"
+               data-autocomplete-value
+               data-val="@(Model.Required ? "true" : null)"
+               data-val-required="@(Model.Required ? requiredMessage : null)" />
+        <button type="button" class="lh-icon-button" data-autocomplete-clear aria-label="Ocisti odabir">
+            <i class="fas fa-xmark"></i>
+        </button>
+        <div class="lh-autocomplete__menu" data-autocomplete-results></div>
+    </div>
+    <span class="lh-validation" data-valmsg-for="@Model.Name" data-valmsg-replace="true"></span>
+</div>

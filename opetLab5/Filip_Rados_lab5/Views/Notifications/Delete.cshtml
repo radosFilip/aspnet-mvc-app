@@ -1,0 +1,14 @@
+@model Notification
+@{ ViewData["Title"] = "Delete notification"; }
+
+<div class="lh-feed-wrapper">
+    <nav class="lh-breadcrumbs"><a asp-action="Index">Notifications</a><span>/</span><span>Delete</span></nav>
+    <form asp-action="Delete" method="post" class="lh-card lh-form-card">
+        <h2 class="lh-form-title">Delete this notification?</h2>
+        <p>@Model.Message</p>
+        <div class="lh-form-actions">
+            <a class="lh-button lh-button--ghost" asp-action="Index">Cancel</a>
+            <button class="lh-button lh-button--danger" type="submit"><i class="fas fa-trash"></i> Delete</button>
+        </div>
+    </form>
+</div>

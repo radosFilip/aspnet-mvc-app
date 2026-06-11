@@ -1,0 +1,15 @@
+@model Like
+@{ ViewData["Title"] = "Lajk #" + Model.Id; }
+
+<div class="lh-feed-wrapper">
+    <nav class="lh-breadcrumbs"><a asp-action="Index">Lajkovi</a><span>/</span><span>Detalji</span></nav>
+    <div class="lh-card">
+        <table class="lh-table">
+            <tbody>
+                <tr><th>ID</th><td>@Model.Id</td></tr>
+                <tr><th>Korisnik</th><td><a asp-controller="Users" asp-action="Details" asp-route-id="@Model.UserId">@Model.User?.Username</a></td></tr>
+                <tr><th>Post</th><td><a asp-controller="Posts" asp-action="Details" asp-route-id="@Model.PostId">@Model.Post?.Title</a></td></tr>
+            </tbody>
+        </table>
+    </div>
+</div>

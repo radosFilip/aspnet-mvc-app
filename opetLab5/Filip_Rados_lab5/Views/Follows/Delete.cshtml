@@ -1,0 +1,14 @@
+@model Follow
+@{ ViewData["Title"] = "Obrisi pracenje"; }
+
+<div class="lh-feed-wrapper">
+    <nav class="lh-breadcrumbs"><a asp-action="Index">Pracenja</a><span>/</span><span>Brisanje</span></nav>
+    <form asp-action="Delete" method="post" class="lh-card lh-form-card">
+        <h2 class="lh-form-title">Obrisati pracenje?</h2>
+        <p><strong>@Model.Follower?.Username</strong> prati <strong>@Model.Following?.Username</strong>.</p>
+        <div class="lh-form-actions">
+            <a class="lh-button lh-button--ghost" asp-action="Index">Odustani</a>
+            <button class="lh-button lh-button--danger" type="submit"><i class="fas fa-trash"></i> Obrisi</button>
+        </div>
+    </form>
+</div>

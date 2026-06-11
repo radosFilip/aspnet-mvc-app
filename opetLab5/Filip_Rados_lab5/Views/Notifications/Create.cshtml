@@ -1,0 +1,16 @@
+@model NotificationFormModel
+@{ ViewData["Title"] = "New notification"; }
+
+<div class="lh-feed-wrapper">
+    <nav class="lh-breadcrumbs"><a asp-action="Index">Notifications</a><span>/</span><span>New notification</span></nav>
+    <form asp-action="Create" method="post" class="lh-card lh-form-card">
+        <h2 class="lh-form-title">New notification</h2>
+        <partial name="_Form" model="Model" />
+        <div class="lh-form-actions">
+            <a class="lh-button lh-button--ghost" asp-action="Index">Cancel</a>
+            <button class="lh-button" type="submit"><i class="fas fa-floppy-disk"></i> Save</button>
+        </div>
+    </form>
+</div>
+
+@section Scripts { @{ await Html.RenderPartialAsync("_ValidationScriptsPartial"); } <script>LifeHack.initForms();</script> }

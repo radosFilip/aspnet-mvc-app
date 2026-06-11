@@ -1,0 +1,26 @@
+@model List<Like>
+
+<div class="lh-card lh-list-card">
+    <table class="lh-table">
+        <thead><tr><th>#</th><th>Korisnik</th><th>Post</th><th></th></tr></thead>
+        <tbody>
+            @foreach (var like in Model)
+            {
+                <tr>
+                    <td class="lh-muted">@like.Id</td>
+                    <td class="lh-strong"><a asp-controller="Users" asp-action="Details" asp-route-id="@like.UserId">@like.User?.Username</a></td>
+                    <td><a asp-controller="Posts" asp-action="Details" asp-route-id="@like.PostId">@like.Post?.Title</a></td>
+                    <td class="lh-row-actions">
+                        <a asp-action="Details" asp-route-id="@like.Id">Detalji</a>
+                        <a asp-action="Edit" asp-route-id="@like.Id">Uredi</a>
+                        <a asp-action="Delete" asp-route-id="@like.Id">Obrisi</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+    @if (!Model.Any())
+    {
+        <div class="lh-empty-state"><i class="fas fa-inbox"></i>Nema lajkova za zadani upit.</div>
+    }
+</div>

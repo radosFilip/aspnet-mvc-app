@@ -1,0 +1,15 @@
+@model Follow
+@{ ViewData["Title"] = "Pracenje #" + Model.Id; }
+
+<div class="lh-feed-wrapper">
+    <nav class="lh-breadcrumbs"><a asp-action="Index">Pracenja</a><span>/</span><span>Detalji</span></nav>
+    <div class="lh-card">
+        <table class="lh-table">
+            <tbody>
+                <tr><th>ID</th><td>@Model.Id</td></tr>
+                <tr><th>Prati</th><td><a asp-controller="Users" asp-action="Details" asp-route-id="@Model.FollowerId">@Model.Follower?.Username</a></td></tr>
+                <tr><th>Pracen</th><td><a asp-controller="Users" asp-action="Details" asp-route-id="@Model.FollowingId">@Model.Following?.Username</a></td></tr>
+            </tbody>
+        </table>
+    </div>
+</div>

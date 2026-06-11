@@ -1,0 +1,30 @@
+@model User
+@{
+    ViewData["Title"] = "Obrisi korisnika";
+    var blocked = ViewBag.DeleteBlockedReason as string;
+}
+
+<div class="lh-feed-wrapper">
+    <nav class="lh-breadcrumbs">
+        <a asp-action="Index">Korisnici</a><span>/</span><span>Brisanje</span>
+    </nav>
+
+    <form asp-action="Delete" method="post" class="lh-card lh-form-card">
+        <div asp-validation-summary="ModelOnly" class="lh-validation-summary"></div>
+        <h2 class="lh-form-title">Obrisati korisnika @Model.Username?</h2>
+        <p class="lh-muted">Ova akcija je dopustena samo ako korisnik nema povezane podatke.</p>
+        @if (!string.IsNullOrEmpty(blocked))
+        {
+            <div class="lh-alert">@blocked</div>
+        }
+        <div class="lh-form-actions">
+            <a class="lh-button lh-button--ghost" asp-action="Index">Odustani</a>
+            @if (string.IsNullOrEmpty(blocked))
+            {
+                <button class="lh-button lh-button--danger" type="submit">
+                    <i class="fas fa-trash"></i> Obrisi
+                </button>
+            }
+        </div>
+    </form>
+</div>

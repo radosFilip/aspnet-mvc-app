@@ -1,0 +1,68 @@
+@model List<User>
+
+<div class="lh-card lh-list-card">
+    <table class="lh-table">
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>Korisnicko ime</th>
+                <th>Ime i prezime</th>
+                <th>Email</th>
+                <th>Datum rodenja</th>
+                <th>Postovi</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var user in Model)
+            {
+                var profileImage = user.ProfileImages?
+                    .OrderByDescending(image => image.CreatedAt)
+                    .FirstOrDefault();
+                var currentUserId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+                var canEditUser = User.IsInRole("Admin") || user.Id.ToString() == currentUserId;
+                <tr>
+                    <td class="lh-muted">@user.Id</td>
+                    <td class="lh-strong">
+                        <span style="display:inline-flex;align-items:center;gap:0.45rem;">
+                            @if (profileImage != null)
+                            {
+                                <img src="@profileImage.FilePath"
+                                     alt="@user.Username"
+                                     style="width:26px;height:26px;border-radius:50%;object-fit:cover;border:1px solid var(--color-border);" />
+                            }
+                            else
+                            {
+                                <i class="fas fa-user-circle"></i>
+                            }
+                            @user.Username
+                        </span>
+                    </td>
+                    <td>@user.FirstName @user.LastName</td>
+                    <td class="lh-muted">@user.Email</td>
+                    <td class="lh-muted">@user.DateOfBirth.ToString("g")</td>
+                    <td>@(user.Posts?.Count ?? 0)</td>
+                    <td class="lh-row-actions">
+                        <a asp-action="Details" asp-route-id="@user.Id">Detalji</a>
+                        @if (canEditUser)
+                        {
+                            <a asp-action="Edit" asp-route-id="@user.Id">Uredi</a>
+                        }
+                        @if (User.IsInRole("Admin"))
+                        {
+                            <a asp-action="Delete" asp-route-id="@user.Id">Obrisi</a>
+                        }
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    @if (!Model.Any())
+    {
+        <div class="lh-empty-state">
+            <i class="fas fa-inbox"></i>
+            Nema korisnika za zadani upit.
+        </div>
+    }
+</div>

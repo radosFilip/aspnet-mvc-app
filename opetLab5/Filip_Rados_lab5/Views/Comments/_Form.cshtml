@@ -1,0 +1,19 @@
+@model CommentFormModel
+
+<input asp-for="Id" type="hidden" />
+<div asp-validation-summary="ModelOnly" class="lh-validation-summary"></div>
+
+<div class="lh-field">
+    <label asp-for="Content" class="lh-label">Komentar</label>
+    <textarea asp-for="Content" class="lh-input lh-textarea"></textarea>
+    <span asp-validation-for="Content" class="lh-validation"></span>
+</div>
+
+<partial name="~/Views/Shared/_DateTimePicker.cshtml"
+         model="@(new DateTimeInputModel { Name = nameof(Model.CreatedAt), Label = "Datum komentara", Value = Model.CreatedAt })" />
+
+<partial name="~/Views/Shared/_Autocomplete.cshtml"
+         model="@(new AutocompleteInputModel { Name = nameof(Model.AuthorId), Label = "Autor", SearchUrl = Url.Action("Autocomplete", "Users") ?? "", SelectedId = Model.AuthorId, SelectedText = Model.AuthorText, Placeholder = "Pretrazi korisnike..." })" />
+
+<partial name="~/Views/Shared/_Autocomplete.cshtml"
+         model="@(new AutocompleteInputModel { Name = nameof(Model.PostId), Label = "Post", SearchUrl = Url.Action("Autocomplete", "Posts") ?? "", SelectedId = Model.PostId, SelectedText = Model.PostText, Placeholder = "Pretrazi objave..." })" />

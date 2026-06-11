@@ -1,0 +1,73 @@
+@model List<Post>
+
+@foreach (var post in Model)
+{
+    var likeCount = post.Likes?.Count ?? 0;
+    var commentCount = post.Comments?.Count ?? 0;
+    var excerpt = string.IsNullOrWhiteSpace(post.Content)
+        ? "No description."
+        : post.Content.Length > 160
+            ? post.Content.Substring(0, 160) + "..."
+            : post.Content;
+    var authorImage = post.Author?.ProfileImages?
+        .OrderByDescending(image => image.CreatedAt)
+        .FirstOrDefault();
+    var currentUserId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+    var canManagePost = User.IsInRole("Admin") || post.AuthorId.ToString() == currentUserId;
+
+    <article class="lh-card lh-list-item">
+        <div class="lh-card__meta">
+            <a asp-action="Index" asp-route-category="@post.Category.ToString()" class="lh-card__category">@post.Category</a>
+            <span class="lh-card__date">@post.CreatedAt.ToString("g")</span>
+        </div>
+
+        <h3 class="lh-card__title">
+            <a asp-action="Details" asp-route-id="@post.Id">@post.Title</a>
+        </h3>
+
+        <p class="lh-card__excerpt">@excerpt</p>
+
+        @if (post.Tags != null && post.Tags.Any())
+        {
+            <div class="lh-card__tags">
+                @foreach (var tag in post.Tags)
+                {
+                    <a asp-controller="Tags" asp-action="Details" asp-route-id="@tag.Id" class="lh-tag">#@tag.Name</a>
+                }
+            </div>
+        }
+
+        <div class="lh-card__footer">
+            <div class="lh-card__author">
+                @if (authorImage != null)
+                {
+                    <img src="@authorImage.FilePath"
+                         alt="@post.Author?.Username"
+                         style="width:24px;height:24px;border-radius:50%;object-fit:cover;border:1px solid var(--color-border);" />
+                }
+                else
+                {
+                    <i class="fas fa-user-circle"></i>
+                }
+                <a asp-controller="Users" asp-action="Details" asp-route-id="@post.AuthorId">@post.Author?.Username</a>
+            </div>
+            <div class="lh-card__actions">
+                <span><i class="fas fa-heart"></i> @likeCount</span>
+                <span><i class="fas fa-comment"></i> @commentCount</span>
+                @if (canManagePost)
+                {
+                    <a asp-action="Edit" asp-route-id="@post.Id">Edit</a>
+                    <a asp-action="Delete" asp-route-id="@post.Id">Delete</a>
+                }
+            </div>
+        </div>
+    </article>
+}
+
+@if (!Model.Any())
+{
+    <div class="lh-card lh-empty-state">
+        <i class="fas fa-inbox"></i>
+        No posts found for this query.
+    </div>
+}

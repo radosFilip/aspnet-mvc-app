@@ -1,0 +1,51 @@
+@model List<Filip_Rados_lab5.Models.UserProfileImage>
+
+@functions {
+    private static string FormatFileSize(long bytes)
+    {
+        if (bytes >= 1024 * 1024) return $"{bytes / 1024d / 1024d:0.0} MB";
+        if (bytes >= 1024) return $"{bytes / 1024d:0.0} KB";
+        return $"{bytes} B";
+    }
+}
+
+@if (!Model.Any())
+{
+    <div class="lh-empty-state" style="padding:1.25rem;">
+        <i class="fas fa-image"></i>
+        Nema spremljenih profilnih slika.
+    </div>
+}
+else
+{
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:1rem;">
+        @foreach (var image in Model)
+        {
+            var isCurrent = image.Id == Model.First().Id;
+            <div style="border:1px solid var(--color-border);border-radius:10px;padding:0.75rem;background:#FAFAFA;">
+                <img src="@image.FilePath"
+                     alt="@image.FileName"
+                     style="width:100%;aspect-ratio:1/1;object-fit:cover;border-radius:8px;background:#eee;" />
+                <div style="margin-top:0.65rem;">
+                    <div style="display:flex;align-items:center;justify-content:space-between;gap:0.5rem;">
+                        <strong style="font-size:0.85rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">@image.FileName</strong>
+                        @if (isCurrent)
+                        {
+                            <span class="lh-tag">Aktivna</span>
+                        }
+                    </div>
+                    <div style="font-size:0.78rem;color:var(--color-muted);margin-top:0.25rem;">
+                        @FormatFileSize(image.FileSize)
+                    </div>
+                    <button type="button"
+                            class="lh-button lh-button--ghost"
+                            style="width:100%;margin-top:0.65rem;justify-content:center;"
+                            data-media-delete
+                            data-delete-url="@Url.Action("DeleteProfileImage", "Users", new { id = image.Id })">
+                        <i class="fas fa-trash"></i> Obrisi
+                    </button>
+                </div>
+            </div>
+        }
+    </div>
+}

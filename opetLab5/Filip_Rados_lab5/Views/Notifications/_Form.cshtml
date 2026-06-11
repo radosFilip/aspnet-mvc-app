@@ -1,0 +1,16 @@
+@model NotificationFormModel
+
+<input asp-for="Id" type="hidden" />
+<div asp-validation-summary="ModelOnly" class="lh-validation-summary"></div>
+
+<div class="lh-field">
+    <label asp-for="Message" class="lh-label">Message</label>
+    <textarea asp-for="Message" class="lh-input lh-textarea"></textarea>
+    <span asp-validation-for="Message" class="lh-validation"></span>
+</div>
+
+<partial name="~/Views/Shared/_DateTimePicker.cshtml"
+         model="@(new DateTimeInputModel { Name = nameof(Model.CreatedAt), Label = "Notification date", Value = Model.CreatedAt })" />
+
+<partial name="~/Views/Shared/_Autocomplete.cshtml"
+         model="@(new AutocompleteInputModel { Name = nameof(Model.RecipientId), Label = "Recipient", SearchUrl = Url.Action("Autocomplete", "Users") ?? "", SelectedId = Model.RecipientId, SelectedText = Model.RecipientText, Placeholder = "Search users..." })" />

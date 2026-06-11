@@ -1,0 +1,24 @@
+@model CommentFormModel
+@{
+    ViewData["Title"] = "Uredi komentar";
+}
+
+<div class="lh-feed-wrapper">
+    <nav class="lh-breadcrumbs">
+        <a asp-action="Index">Komentari</a><span>/</span><span>Uredi</span>
+    </nav>
+
+    <form asp-action="Edit" method="post" class="lh-card lh-form-card">
+        <h2 class="lh-form-title">Uredi komentar</h2>
+        <partial name="_Form" model="Model" />
+        <div class="lh-form-actions">
+            <a class="lh-button lh-button--ghost" asp-action="Index">Odustani</a>
+            <button class="lh-button" type="submit"><i class="fas fa-floppy-disk"></i> Spremi</button>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    @{ await Html.RenderPartialAsync("_ValidationScriptsPartial"); }
+    <script>LifeHack.initForms();</script>
+}

@@ -1,0 +1,736 @@
+CHAT LOG - Lab5 thread
+Workspace: C:\Users\Filip\Desktop\asp final countdown\lab5
+Thread title: Prouci Lab5.pfd i projekt
+
+Napomena:
+Ovaj zapis je slozen iz dostupnog zapisa threada. Tool/output ispisi nisu ukljuceni, nego korisnicke poruke i moji tekstualni odgovori/sažeci aktivnosti. Turnovi koje je korisnik prekinuo oznaceni su kao PREKINUTO.
+
+================================================================================
+1. KORISNIK
+================================================================================
+# Files mentioned by the user:
+Lab5.pdf: C:\Users\Filip\Downloads\Lab5.pdf
+
+Prouči datoteku Lab5.pfd i projekt u mapi lab5
+
+ASISTENT
+Proucio sam Lab5.pdf i projekt u lab5. Nisam nista mijenjao.
+
+PDF trazi za Lab 5:
+- API podrsku za sve entitete: CRUD, DTO klase, GET all, GET by id, POST, PUT, DELETE, pretraga.
+- ASP.NET Core Identity: lokalna registracija/prijava, AppUser prosiren s OIB i JMBG, role Admin i barem jos jedna.
+- Autorizaciju: javne akcije odvojiti od zasticenih, Create/Edit/Delete ograniciti rolama.
+- Upload datoteka: asinkrono, spremanje na disk, metapodaci u bazu, AJAX lista i brisanje.
+- 3rd party login: Google ili Facebook.
+- Integracijske testove za API CRUD endpointove.
+
+Trenutni projekt je ASP.NET Core MVC aplikacija LifeHack4Life s EF Core + SQL Server LocalDB. Ima klasicne MVC controllere i viewove za entitete User, Post, Comment, Tag, Like, Follow, Message, Notification, Report.
+
+Stanje prema zahtjevima: projekt se builda, ali Lab 5 funkcionalnosti uglavnom jos nisu dodane. Nisam nasao ApiController, DTO klase, Identity konfiguraciju, [Authorize], Dropzone/upload, Google/Facebook auth ni testni projekt. Build prolazi uz postojece nullable warninge na modelima.
+
+Najlogicniji sljedeci korak je prvo dodati API + DTO sloj za postojece entitete, jer to postavlja temelj za integracijske testove. Nakon toga Identity/role, pa upload.
+
+================================================================================
+2. KORISNIK
+================================================================================
+Kreni sa dodavanjem API+DTO i nakon toga mi objasni kako novi kod funkcionira i koje su datoteke i klase izmjenjene.
+
+ASISTENT
+Dodao sam API + DTO sloj bez diranja postojecih MVC viewova/controllera.
+
+Dodano:
+- Dtos/ApiDtos.cs
+- Dtos/ApiDtoMapper.cs
+- Controllers/Api/UsersApiController.cs -> api/users
+- Controllers/Api/PostsApiController.cs -> api/posts
+- Controllers/Api/TagsApiController.cs -> api/tags
+- Controllers/Api/CommentsApiController.cs -> api/comments
+- Controllers/Api/LikesApiController.cs -> api/likes
+- Controllers/Api/FollowsApiController.cs -> api/follows
+- Controllers/Api/MessagesApiController.cs -> api/messages
+- Controllers/Api/NotificationsApiController.cs -> api/notifications
+- Controllers/Api/ReportsApiController.cs -> api/reports
+
+Svaki API controller ima osnovni CRUD: GET all, GET by id, POST, PUT, DELETE. GET metode podrzavaju pretragu preko q, a postovi i filter category.
+
+API ne vraca EF entitete direktno, nego DTO klase. Za unos koristi create/update DTO klase. Mapiranje iz entiteta u DTO radi ApiDtoMapper preko metoda poput post.ToDto(), user.ToDto(), tag.ToDto().
+
+Validacija je prenesena iz postojeceg form sloja: obavezna polja, duljine stringova, email format, duplikati korisnickog imena/emaila, dupli like/follow, korisnik ne moze pratiti sam sebe itd.
+
+Status kodovi:
+- 200 OK za uspjesan dohvat/izmjenu
+- 201 Created za kreiranje
+- 204 No Content za brisanje
+- 400 Bad Request za validaciju
+- 404 Not Found za nepostojeci ID
+- 409 Conflict za konfliktne operacije
+
+Provjera: build prolazi, ostali su samo stari nullable warningi.
+
+================================================================================
+3. KORISNIK
+================================================================================
+Pojasni mi malo više API i DTO
+
+ASISTENT
+DTO znaci Data Transfer Object. To je klasa koja opisuje sto API prima ili vraca, odvojeno od stvarnih EF modela iz baze.
+
+Primjer: Post model u bazi ima navigacije Author, Comments, Likes, Reports, Tags. Ako API vrati cijeli Post direktno, JSON moze povuci previse podataka ili napraviti kruzne reference. Zato postoji PostDto koji vraca samo ono sto klijentu treba: id, title, content, category, createdAt, author summary, tags, commentCount i likeCount.
+
+Za unos postoje posebni DTO-i, npr. PostCreateUpdateDto. Klijent ne salje cijelog autora ili tag objekte, nego samo AuthorId i TagIds. API onda provjeri postoje li ti zapisi i poveze ih.
+
+API controller ne vraca HTML view, nego JSON. Primjer ruta:
+- GET /api/posts
+- GET /api/posts/1
+- POST /api/posts
+- PUT /api/posts/1
+- DELETE /api/posts/1
+
+[ApiController] pomaze kod API ponasanja i validacije, a ControllerBase se koristi jer API controller ne treba viewove.
+
+Mapiranje je u ApiDtoMapper.cs. Primjer: post.ToDto() pretvara EF entitet Post u PostDto. Zato controller moze vracati Ok(post.ToDto()).
+
+API vraca HTTP status kodove: 200, 201, 204, 400, 404, 409. Ukratko: API je ulaz/izlaz aplikacije za druge klijente, a DTO je kontrolirani oblik podataka koji kroz taj API smije proci.
+
+================================================================================
+4. KORISNIK
+================================================================================
+kako to sada u praksi funkcionira, objasni mi kako to funkcionira u ovom projektu
+
+ASISTENT
+U ovom projektu sada postoje dva paralelna sloja:
+1. MVC web aplikacija koju vidis u browseru kao HTML stranice.
+2. API sloj koji vraca JSON podatke za vanjske klijente, JavaScript, testove ili Postman.
+
+Postojece MVC stranice i dalje rade isto: /Posts, /Posts/Details/1, /Users, /Tags.
+
+Novi API radi preko ruta:
+- /api/posts
+- /api/users
+- /api/tags
+- /api/comments
+- /api/likes
+- /api/follows
+- /api/messages
+- /api/notifications
+- /api/reports
+
+Za GET /api/posts controller uzme podatke iz baze preko AppDbContext, ucita povezane podatke preko Include, pretvori Post entitet u PostDto i vrati JSON s Ok(...).
+
+Za GET /api/posts/1 API trazi post po ID-u. Ako postoji vraca 200 OK i JSON, ako ne postoji vraca 404 Not Found.
+
+Za POST /api/posts klijent salje JSON s title, content, category, authorId i tagIds. API validira autora i tagove, kreira Post entitet i sprema ga u bazu. Ako uspije vraca 201 Created.
+
+Za PUT /api/posts/1 API trazi post, validira podatke, mijenja dopustena polja i vraca novi DTO.
+
+Za DELETE /api/posts/1 brise zapis i vraca 204 No Content, a za nepostojeci ID 404.
+
+MVC controlleri vracaju View(...), API controlleri vracaju Ok(...), CreatedAtAction(...), NotFound(...) i slicno. Oba sloja rade nad istom bazom i istim entitetima.
+
+Tok:
+HTTP zahtjev -> /api/posts -> PostsApiController -> AppDbContext -> SQL Server baza -> Post entitet -> ApiDtoMapper.ToDto() -> PostDto -> JSON odgovor.
+
+================================================================================
+5. KORISNIK
+================================================================================
+Upload datoteka mora biti vezan uz konkretnog kviza
+Upload raditi asinkrono preko Dropzone komponente ili održavane alternative
+Datoteke spremiti na disk
+U bazu spremiti metapodatke i putanju
+Popis datoteka učitati AJAX pozivom
+Omogućiti brisanje postojećih datoteka
+
+Htio bih omogućiti u aplikaciji spremanje videozapise za objave (Post) i profilne slike korisničkih računa..
+
+ASISTENT - PREKINUTO
+Krenuo sam s uploadom za videozapise vezane uz Post i profilne slike vezane uz User. Dodani su temelji:
+- modeli PostVideo i UserProfileImage
+- veze u AppDbContext
+- upload/list/delete akcije u PostsController i UsersController
+- native AJAX upload zona u site.js
+- partial viewovi _VideoList.cshtml i _ProfileImageList.cshtml
+- upload UI na Posts/Edit.cshtml i Users/Edit.cshtml
+- prikaz videa na Posts/Details.cshtml
+- prikaz profilne slike na Users/Details.cshtml
+- DTO prosirenja za medije
+- migracija AddMediaUploads
+
+Turn je bio prekinut prije zavrsnog odgovora, ali kasniji odgovori potvrdjuju i objasnjavaju implementaciju.
+
+================================================================================
+6. KORISNIK
+================================================================================
+Pri kreiranju objave, u formi postavi opciju za prijenos videozapisa. Slanjem forme videozapis se sprema u lokalnu datoteku, a u bazu podataka sprema se putanja u tablici PostVideos. Video se nalazi ispod naslova od Posta. Pretpostavljam da tako funkcionira, ali izgeneriraj ako je još nešto potrebno ili izmijeni postojeći kod.
+
+ASISTENT - PREKINUTO
+Odgovorio sam da razumijem: upload videa treba biti vec na Create formi, u istom submitu kao objava. Opisao sam tok: post se prvo spremi da dobije ID, zatim se video spremi u folder tog posta i u PostVideos tablicu. Turn je prekinut, a sljedeci ponovljeni zahtjev je dovrsen.
+
+================================================================================
+7. KORISNIK
+================================================================================
+Pri kreiranju objave, u formi postavi opciju za prijenos videozapisa. Slanjem forme videozapis se sprema u lokalnu datoteku, a u bazu podataka sprema se putanja u tablici PostVideos. Video se nalazi ispod naslova od Posta. Pretpostavljam da tako funkcionira, ali izgeneriraj ako je još nešto potrebno ili izmijeni postojeći kod. Ne znam jel se u vježbi traži ili preporučuje da se videozapis doda nakon što se kreira Post ili pri kreiranju, odnosno slanju forme.
+
+ASISTENT
+Dodao sam upload videa direktno na Create formu za objavu.
+
+Kako radi:
+1. Create.cshtml forma ima enctype="multipart/form-data" i file input videoFile.
+2. Kad kliknes Spremi, PostsController prvo validira podatke objave i video.
+3. Zatim spremi Post u bazu da dobije post.Id.
+4. Ako je video odabran, sprema ga na disk.
+5. U tablicu PostVideos sprema metapodatke: PostId, originalni naziv, putanju, content type, velicinu i vrijeme.
+6. Na Details.cshtml video se prikazuje odmah ispod naslova posta.
+
+Ostavio sam i postojeci async upload na Edit stranici. To je blize onome sto PDF preporucuje jer zapis tada vec ima ID, ali upload pri kreiranju je korektno izveden jer controller prvo spremi post, pa tek onda video.
+
+Provjera: build prolazi.
+
+================================================================================
+8. KORISNIK
+================================================================================
+Želio bih da putanja spremanja videozapisa bude wwwroot/uploads/posts/videos/ . Postoji li neki razlog da postoji dodatni direktorij sa naziv PostId
+
+ASISTENT
+Promijenio sam spremanje videa na zajednicku putanju:
+wwwroot/uploads/posts/videos/
+
+U bazi ce PostVideos.FilePath za nove uploadove izgledati otprilike:
+/uploads/posts/videos/{guid}.mp4
+
+Razlog za prijasnji folder s PostId bio je praktican: lakse grupiranje datoteka jednog posta i lakse brisanje svih datoteka jednog posta. Nije nuzan jer se datoteke spremaju s GUID nazivom, pa nema realnog problema s duplim imenima ni u zajednickom folderu.
+
+Zato sam promijenio cleanup logiku: kod brisanja posta vise se ne smije obrisati cijeli uploads/posts/videos folder. Sada PostsController brise samo fizicke datoteke vezane uz taj post, zatim obrise Post.
+
+Build prolazi.
+
+================================================================================
+9. KORISNIK
+================================================================================
+Sada napravi da korisnici mogu imati profilne slike
+
+ASISTENT
+Napravio sam da korisnici mogu imati profilne slike u praksi, ne samo u modelu.
+
+Pri kreiranju korisnika mozes odmah odabrati profilnu sliku. Controller prvo spremi korisnika, dobije user.Id, zatim sliku spremi lokalno u:
+wwwroot/uploads/users/{userId}/profile-images/
+
+Metapodatke i putanju sprema u tablicu UserProfileImages.
+
+Na Edit stranici i dalje postoji async upload/list/delete za profilne slike. Najnovija uploadana slika tretira se kao aktivna profilna slika.
+
+Izmijenjeno/dopunjeno:
+- UsersController.cs prima profileImageFile pri kreiranju, validira sliku i sprema je.
+- Users/Create.cshtml dobio je file input za profilnu sliku.
+- Users/_List.cshtml prikazuje profilnu sliku u tablici korisnika.
+- Users/Details.cshtml prikazuje profilnu sliku na profilu i kod povezanih profila.
+- HomeController.cs ucitava profilne slike za feed.
+- Home/Index.cshtml prikazuje slike autora u feedu i shortcutu profila.
+- PostsController.cs ucitava profilnu sliku autora posta.
+- Posts/_List.cshtml i Posts/Details.cshtml prikazuju sliku autora.
+
+Build prolazi s 0 errora, uz postojece nullable warninge.
+
+================================================================================
+10. KORISNIK
+================================================================================
+Objasni mi detaljnije što si sve napravio, kako se prvo post ili korisnik kreira, zatim medij poveže s njim
+
+ASISTENT
+Napravio sam isti princip za oba slucaja: prvo se kreira glavni zapis, tek onda se sprema medij jer medij mora imati strani kljuc prema tom zapisu.
+
+PostVideo mora imati PostId, a UserProfileImage mora imati UserId. Ti ID-evi ne postoje dok Post ili User nisu spremljeni u bazu. Zato se prvo napravi SaveChangesAsync za glavni entitet, EF/SQL mu dodijeli Id, i tek tada se moze spremiti datoteka i metapodaci.
+
+Kreiranje objave:
+1. Forma ima enctype="multipart/form-data".
+2. File input se zove videoFile.
+3. Controller prima PostFormModel i IFormFile? videoFile.
+4. Validira formu i video.
+5. Kreira i spremi Post.
+6. Nakon spremanja postoji post.Id.
+7. Poziva se SavePostVideo(post.Id, videoFile).
+
+SavePostVideo:
+- kreira folder uploads/posts/videos
+- generira GUID ime datoteke
+- kopira datoteku na disk
+- u PostVideos sprema PostId, originalni naziv, FilePath, ContentType, FileSize, CreatedAt
+
+U bazu se ne sprema sama video datoteka, nego metapodaci i putanja. Sama datoteka je na disku.
+
+Kreiranje korisnika radi isto: prvo se spremi User, dobije user.Id, pa se kroz SaveProfileImage(user.Id, profileImageFile) sprema slika i zapis UserProfileImage.
+
+Profilne slike idu u:
+wwwroot/uploads/users/{userId}/profile-images/
+
+Ukratko: entitet prvo dobije ID iz baze, a tek onda medij dobije putanju i strani kljuc prema tom ID-u.
+
+================================================================================
+11. KORISNIK
+================================================================================
+Popis datoteka učitati AJAX pozivom. Možeš li mi ovo objasniti
+
+ASISTENT
+“Popis datoteka ucitati AJAX pozivom” znaci da se stranica prvo otvori normalno, a zatim JavaScript naknadno posalje mali HTTP zahtjev serveru i dohvati samo dio HTML-a s popisom datoteka. Ne ucitava se cijela stranica ponovno.
+
+U aplikaciji se to koristi na Edit stranicama.
+
+Primjer za video: Posts/Edit.cshtml ima data-media-upload blok s data-list-url i data-target. Za post s ID-em 5 URL bi bio otprilike /Posts/GetVideos?postId=5.
+
+PostsController.GetVideos(postId) ucita videozapise iz baze i vrati partial view _VideoList. To nije cijela stranica, nego samo HTML za popis videa i gumbe za brisanje.
+
+U site.js funkcija loadList() napravi $.get(listUrl), dobije HTML i ubaci ga u target div. Nakon uploada i nakon brisanja opet se pozove loadList(), pa se popis osvjezi bez reloadanja cijele stranice.
+
+Isti obrazac postoji za profilne slike preko Users/GetProfileImages?userId=...
+
+Prednost: nakon uploada ili brisanja osvjezi se samo mali dio stranice, a ne cijeli ekran.
+
+================================================================================
+12. KORISNIK
+================================================================================
+Upload datoteka mora biti vezan uz konkretnog kviza
+Upload raditi asinkrono preko Dropzone komponente ili održavane alternative
+Datoteke spremiti na disk
+U bazu spremiti metapodatke i putanju
+Popis datoteka učitati AJAX pozivom
+Omogućiti brisanje postojećih datoteka
+
+Provjeri postoje li ove komponente u projektu
+
+ASISTENT
+Provjerio sam. Komponente uglavnom postoje, ali uz bitnu napomenu: u projektu nema entiteta Quiz, nego je funkcionalnost vezana na Post videozapise i User profilne slike.
+
+Stanje po zahtjevima:
+- Upload vezan uz konkretan zapis postoji: PostVideo.PostId i UserProfileImage.UserId.
+- Asinkroni upload postoji na Edit stranicama kroz data-media-upload i site.js. Nije Dropzone biblioteka, nego vlastita odrziva alternativa s fetch/drag-drop/hidden file inputom.
+- Datoteke se spremaju na disk:
+  - video: wwwroot/uploads/posts/videos/
+  - profilne slike: wwwroot/uploads/users/{userId}/profile-images/
+- Metapodaci i putanja u bazi postoje u PostVideos i UserProfileImages.
+- Popis datoteka AJAX pozivom postoji: PostsController.GetVideos i UsersController.GetProfileImages vracaju partial viewove.
+- Brisanje postojecih datoteka postoji: DeleteVideo i DeleteProfileImage brisu fizicku datoteku i zapis u bazi.
+
+Napomena: upload pri Create formi za post/korisnika postoji, ali to je obican multipart submit. AJAX/asinkroni upload postoji na Edit stranicama.
+
+================================================================================
+13. KORISNIK
+================================================================================
+# Files mentioned by the user:
+edit-form-skill.md
+entity-framework-skill.md
+list-page-skill.md
+
+Autentikacija mora biti uključena kroz ASP.NET Core Identity
+Lokalna registracija i prijava moraju raditi
+AppUser mora biti proširen traženim poljima
+Autorizacija mora ograničavati akcije prema pravilima zadatka
+Javne akcije dostupne su anonimnim korisnicima
+Create/Edit/Delete dostupni su samo dopuštenim korisnicima
+Role Admin i barem još jedna rola moraju biti implementirane
+
+Ovo su idući zadatci. Dodaj stranicu za autentikaciju koja ima opcije za prijavu ili registraciju (kreiranje novog korisnika). Potrebno je u klasi User dodati password i nakon toga napraviti migraciju u bazi podataka. Za običnog korisnika, CREATE/EDIT/DELETE je dostupan samo za njegove postove. Može pregledavati druge korisnike, postove, teme itd. Ono što korisnik ne može imati uvid je popis svih entiteta. Unutar navigacije ukloni CRUD opcije i objave. U navigaciji dodaj opciju za dodavanje novog posta. Unutar forme za kreiranje novog posta, ukloni opciju odabiranja korisnika koji je kreirao jer se podrazumijeva da je post kreiran od strane korisnika koji je trenutno prijavljen. Neka postoji opcija za pregled stranice bez korisničkog računa, ta osoba nema opciju za dodavanje postova.
+
+ASISTENT - PREKINUTO
+Krenuo sam s implementacijom Identity autentikacije:
+- postojeći User pretvoren u Identity korisnika
+- AppDbContext prebacen na IdentityDbContext
+- dodani AuthController, AuthViewModels i Auth view
+- dodan Identity u Program.cs
+- dodano seedanje rola Admin i User
+- Post create uzima autora iz trenutno prijavljenog korisnika
+- Edit/Delete za post ograniceni na autora ili Admina
+- navigacija preuredjena
+- CRUD kontroleri za administrativne entitete ograniceni na Admina
+- dodana migracija, ali se pojavila kolizija Username/UserName zbog SQL Server case-insensitive imena stupaca
+
+Turn je prekinut tijekom ispravljanja te kolizije. Dovrseno je u sljedecem turnu.
+
+================================================================================
+14. KORISNIK
+================================================================================
+nastavi sa ispravljanjem grešaka
+
+ASISTENT
+Nastavio sam i ispravio greske oko Username/UserName kolizije s ASP.NET Core Identityjem. Problem je bio sto SQL Server ne razlikuje Username i UserName, pa sam Identity UserName mapirao na postojeci stupac Username, umjesto da migracija dodaje novi dupli stupac.
+
+Napravljeno:
+- User nasljeduje IdentityUser<int>.
+- Lozinka se ne sprema kao obican Password, nego kroz Identity kao PasswordHash.
+- AppDbContext nasljeduje IdentityDbContext<User, IdentityRole<int>, int>.
+- Dodana auth stranica za prijavu/registraciju.
+- Program.cs ukljucuje Identity, UseAuthentication(), role seed i pocetnog admina.
+- Role Admin i User su seedane u bazu.
+- Lokalni admin racun je kreiran: admin / Admin123!
+- Kreiranje posta automatski koristi trenutno prijavljenog korisnika kao autora.
+- Edit/Delete za post dopusten je samo autoru posta ili adminu.
+- Navigacija vise nema CRUD dropdown ni direktnu stavku Objave; dodana je Nova objava samo za prijavljene korisnike.
+- CRUD kontroleri za komentare, lajkove, pracenja, poruke, obavijesti i prijave ograniceni su na Admin.
+- Migracija AddIdentityAuthentication je generirana i primijenjena.
+
+Provjera: build prolazi s 0 warninga i 0 errora u tom trenutku.
+
+Napomena: postojeci korisnici iz stare baze nemaju PasswordHash, pa se nece moci prijaviti dok im se lozinka ne postavi kroz Identity. Novi korisnici kroz registraciju rade normalno.
+
+================================================================================
+15. KORISNIK
+================================================================================
+koja je lozinka od admina
+
+ASISTENT
+Lozinka pocetnog admin racuna je:
+Admin123!
+
+Korisnicko ime: admin
+Email: admin@lifehack.local
+
+================================================================================
+16. KORISNIK
+================================================================================
+Pojednostavi formu za prijavi i registraciju. Makni sve gumbove u formi i samo ostavi opcije odustani i prijavi ili registriraj (ovisno što je birano)
+
+ASISTENT
+Pojednostavio sam auth formu u Views/Auth/Index.cshtml.
+
+Sada:
+- nema gumba Nastavi bez racuna u headeru
+- prebacivanje Prijava / Registracija je obican tekstualni izbor, ne veliki gumbovi
+- forma za prijavu ima samo Odustani i Prijavi se
+- forma za registraciju ima samo Odustani i Registriraj se
+- maknuo sam ikone iz submit gumba da bude cisce
+
+Provjera: build prolazi, ostaju postojeći nullable warningi.
+
+================================================================================
+17. KORISNIK
+================================================================================
+Google ili Facebook login mora raditi. To je opcija pod prijavom
+
+ASISTENT
+Dodao sam Google login kao opciju ispod lokalne prijave.
+
+Izmijenjeno:
+- dodan paket Microsoft.AspNetCore.Authentication.Google
+- Program.cs dodana Google auth konfiguracija
+- AuthController.cs dodan external login flow
+- Views/Auth/Index.cshtml dodan gumb Prijavi se s Google racunom
+- appsettings.json dodana mjesta za ClientId i ClientSecret
+
+Da Google login stvarno radi, u Google Cloud Console treba postaviti redirect URI:
+https://localhost:7218/signin-google
+
+Zatim u appsettings.json treba unijeti Google ClientId i ClientSecret.
+
+Build prolazi. Napomena: u ovom trenutku dodan je Google login; Facebook je dodan kasnije na zaseban zahtjev.
+
+================================================================================
+18. KORISNIK
+================================================================================
+Da Google login stvarno radi, u Google Cloud Console trebaš postaviti redirect URI:
+https://localhost:7218/signin-google
+Zatim unesi vrijednosti ovdje:
+"Authentication": {
+  "Google": {
+    "ClientId": "OVDJE_CLIENT_ID",
+    "ClientSecret": "OVDJE_CLIENT_SECRET"
+  }
+}
+
+Jel ovo ja trebam sam postaviti ili već si to napravio?
+
+ASISTENT
+To moras sam postaviti u Google Cloud Console, jer ClientId i ClientSecret pripadaju tvojem Google OAuth projektu i ja ih ne mogu znati niti generirati lokalno bez tvog Google racuna.
+
+Ja sam napravio kod koji podrzava Google login. U appsettings.json su mjesta za ClientId i ClientSecret. Kad u Google Cloud Console kreiras OAuth Client, dodas:
+https://localhost:7218/signin-google
+
+Onda kopiras ClientId i ClientSecret u appsettings.json. Nakon toga Google prijava moze raditi.
+
+================================================================================
+19. KORISNIK
+================================================================================
+Prijavio sam se google računom, ali kad se odjavim, ne mogu se prijaviti drugim google računom
+
+ASISTENT
+Popravio sam Google login tako da pri svakoj Google prijavi trazi izbor racuna.
+
+Promjene:
+- U Program.cs dodan je prompt=select_account u Google OAuth redirect.
+- U AuthController.cs odjava dodatno cisti Identity external cookie.
+
+Vazno: ovo ne odjavljuje korisnika iz Googlea u pregledniku, nego pri iducoj prijavi prikaze Googleov odabir racuna. Tako mozes odabrati drugi Google racun.
+
+Build prolazi.
+
+================================================================================
+20. KORISNIK
+================================================================================
+dodaj još za facebook login
+
+ASISTENT
+Dodao sam Facebook login uz Google.
+
+Promjene:
+- Dodan paket Microsoft.AspNetCore.Authentication.Facebook.
+- Program.cs konfigurira Google i Facebook ako su uneseni podaci.
+- AuthController.cs prihvaca Google i Facebook provider.
+- Views/Auth/Index.cshtml ima gumb Prijavi se s Facebook racunom.
+- appsettings.json ima prazna mjesta za Facebook AppId i AppSecret.
+
+Za Facebook Developer Console redirect URI koristi:
+https://localhost:7218/signin-facebook
+
+Build prolazi uspjesno.
+
+================================================================================
+21. KORISNIK
+================================================================================
+ne znam gdje treba dodati redirect URI, napravio sam aplikaciju na meta for developers
+
+ASISTENT
+Trebas ga dodati u Facebook Login postavke, ne samo u osnovne postavke aplikacije.
+
+Koraci:
+1. Otvori Meta for Developers.
+2. Udi u svoju aplikaciju.
+3. U lijevom izborniku idi na Use cases ili Add products.
+4. Dodaj/otvori Facebook Login.
+5. Odaberi Settings unutar Facebook Login proizvoda.
+6. Nadi polje Valid OAuth Redirect URIs.
+7. Dodaj:
+   https://localhost:7218/signin-facebook
+8. Klikni Save changes.
+
+U appsettings.json upises Facebook AppId i AppSecret iz Meta aplikacije pod App settings > Basic. Za lokalni razvoj aplikacija moze ostati u Development mode, ali login tada radi samo za tvoj Facebook racun ili racune dodane kao testere/developere.
+
+================================================================================
+22. KORISNIK
+================================================================================
+This content isn't available right now
+Invalid Scopes: email. This message is only shown to developers. Users of your app will ignore these permissions if present. Please read the documentation for valid permissions at: https://developers.facebook.com/docs/facebook-login/permissions
+
+ASISTENT
+Popravio sam Facebook login za gresku Invalid Scopes: email.
+
+Problem: ASP.NET Facebook login po defaultu moze slati email scope, a tvoja Meta aplikacija ga trenutno ne prihvaca. Zato Facebook prekine prijavu prije povratka u aplikaciju.
+
+Promjene:
+- U Program.cs dodan je options.Scope.Clear() za Facebook.
+- Facebook login vise ne trazi email permission.
+- U AuthController.cs login moze kreirati korisnika i ako Facebook ne vrati email adresu.
+
+Ako Facebook ne vrati email, korisnik se povezuje preko Facebook provider ID-ja, a aplikacija generira korisnicko ime iz Facebook_{id}. Build prolazi.
+
+================================================================================
+23. KORISNIK
+================================================================================
+prilikom prijave ispise mi Email " is invalid. i ne prijavim se kao novi korisnik
+
+ASISTENT
+Popravio sam gresku Email "" is invalid kod Facebook prijave.
+
+Problem: Facebook ti ne vraca email adresu, a ASP.NET Identity ne zeli kreirati korisnika s praznim/neispravnim emailom.
+
+Promjena u AuthController.cs:
+- Ako Facebook ne vrati email, aplikacija generira internu valjanu adresu oblika facebook_{facebookId}@external.local.
+- EmailConfirmed je false za takav fallback email.
+- Korisnik se povezuje preko Facebook provider ID-ja, tako da se sljedeci put prijavljuje na isti lokalni racun.
+- Ako Google/Facebook vrati pravi email, i dalje se koristi pravi email.
+
+Build prolazi s 0 warninga i 0 errora.
+
+================================================================================
+24. KORISNIK
+================================================================================
+kada spremim novu sliku za korisnika pod Users/Edit/{?} neka me preusmjeri na stranicu Users/Details/{?}
+
+ASISTENT
+Napravio sam da nakon spremanja profilne slike na Users/Edit/{id} automatski prebaci na Users/Details/{id}.
+
+Promjene:
+- U UsersController.cs klasicno spremanje Edit forme sada ide na Details umjesto na Index.
+- U Views/Users/Edit.cshtml dodan je data-redirect-url za upload profilne slike.
+- U wwwroot/js/site.js upload helper sada, ako postoji data-redirect-url, nakon uspjesnog uploada preusmjerava korisnika.
+
+Provjera: build prolazi.
+
+================================================================================
+25. KORISNIK
+================================================================================
+Umjesto kartice teme na pocetnoj stranici neka budu kategorije, klikom na neku kategoriju filtriraju se postovi koji pripadaju toj kategoriji
+
+ASISTENT
+Promijenio sam pocetnu stranicu: umjesto kartice Teme sada prikazuje Kategorije.
+
+Klik na kategoriju vodi na postojeći filter postova, npr.:
+Posts/Index?category=Technology
+
+Izmijenjeno:
+- HomeController.cs vise ne ucitava tagove za pocetnu.
+- Views/Home/Index.cshtml generira linkove iz PostCategory enum vrijednosti.
+
+Build prolazi.
+
+================================================================================
+26. KORISNIK
+================================================================================
+kako se admin razlikuje od korisnika
+
+ASISTENT
+Admin i obicni korisnik razlikuju se po roli u ASP.NET Core Identity sustavu.
+
+Postoje role:
+- Admin
+- User
+
+Admin racun:
+admin / Admin123!
+
+Admin moze:
+- pristupiti starim CRUD kontrolerima za entitete kao sto su komentari, lajkovi, poruke, obavijesti, prijave i pracenja
+- uredjivati i brisati tudje postove
+- uredjivati i brisati korisnike
+- uredjivati tudje profile/profilne slike
+- upravljati tagovima/kategorijama gdje je to ograniceno admin pravilima
+
+Obicni korisnik moze:
+- pregledavati javni dio aplikacije
+- pregledavati druge korisnike, postove i kategorije
+- kreirati novu objavu ako je prijavljen
+- uredjivati i brisati samo svoje postove
+- uredjivati svoj profil i svoju profilnu sliku
+- ne moze pristupiti admin CRUD popisima svih entiteta
+
+Anonimni korisnik moze pregledavati javni sadrzaj, ali ne moze kreirati, uredjivati ni brisati.
+
+================================================================================
+27. KORISNIK
+================================================================================
+gdje se u kodu nalaze te role
+
+ASISTENT
+Role su definirane i seedane u Program.cs, u metodi SeedIdentityAsync.
+
+Tamo se kreiraju role Admin i User:
+foreach (var roleName in new[] { "Admin", "User" }) { ... }
+
+Admin korisnik se kreira u istoj metodi:
+- username: admin
+- email: admin@lifehack.local
+- password: Admin123!
+
+Adminu se dodaje rola Admin.
+
+Obicni korisnik dobiva rolu User u AuthController.cs kod registracije i kod prvog kreiranja korisnika preko Google/Facebook prijave.
+
+Pravila pristupa vidis kroz atribute poput:
+[Authorize(Roles = "Admin")]
+
+i provjere:
+User.IsInRole("Admin")
+
+================================================================================
+28. KORISNIK
+================================================================================
+Gumb za objavu novog posta neka se poveća, omogući da korisnik (User i Admin) moze staviti like na post i komentirati.
+
+Neka se za User doda u navigaciji opcija Notifications gdje ce primati obavijesti o komentarima i lajkovima.
+
+Osnovne feature u aplikaciji prevedi sa hrvatskog na engleski
+
+ASISTENT - PREKINUTO
+Implementirao sam veci New Post gumb, like/comment akcije i notifikacije:
+- PostsController dobio ToggleLike i AddComment.
+- Like gumb i forma komentara dodani su na Posts/Details.cshtml.
+- Ako korisnik lajka ili komentira tudji post, vlasnik posta dobiva Notification.
+- NotificationsController otkljucan je za prijavljene korisnike; obicni korisnik vidi svoje notifikacije, admin vidi sve.
+- U navigaciju dodani New Post i Notifications.
+- Pocetna, auth, post i notification dijelovi djelomicno prevedeni na engleski.
+
+Turn je prekinut prije finalnog odgovora zbog nove korisnicke upute. Dio izmjena je kasnije djelomicno vracen za Notifications CRUD.
+
+================================================================================
+29. KORISNIK
+================================================================================
+pod notifications makni CRUD opcije
+
+ASISTENT - PREKINUTO
+Krenuo sam maknuti CRUD opcije iz Notifications UI-ja:
+- uklonjen je New notification gumb iz Notifications/Index.cshtml
+- uklonjeni su Edit/Delete linkovi iz Notifications/_List.cshtml
+
+Turn je prekinut prije finalnog odgovora, a korisnik je odmah zatrazio ponistavanje zadnjih izmjena.
+
+================================================================================
+30. KORISNIK
+================================================================================
+ponišiti ove zadnje
+
+ASISTENT
+Ponistio sam zadnje dvije izmjene za Notifications.
+
+Vraceno je:
+- New notification gumb u Views/Notifications/Index.cshtml
+- Edit i Delete linkovi za Admina u Views/Notifications/_List.cshtml
+
+Ostale ranije promjene nisam dirao.
+
+================================================================================
+31. KORISNIK
+================================================================================
+Integracijski testovi moraju pokriti API endpointe za sve CRUD operacije
+Testirati uspješne scenarije
+Testirati nepostojeće ID-eve
+Testirati validacijske pogreške gdje postoje
+
+ASISTENT - PREKINUTO
+Turn je prekinut odmah nakon korisnicke poruke, bez asistentskog odgovora.
+
+================================================================================
+32. KORISNIK
+================================================================================
+# Files mentioned by the user:
+Lab5.pdf: C:\Users\Filip\Downloads\Lab5.pdf
+
+Integracijski testovi moraju pokriti API endpointe za sve CRUD operacije
+Testirati uspješne scenarije
+Testirati nepostojeće ID-eve
+Testirati validacijske pogreške gdje postoje
+
+Na kraju Lab5.pdf se nalaze upute za testove
+
+ASISTENT
+Dodao sam integracijske testove prema uputama iz kraja Lab5.pdf.
+
+Napravljeno:
+- Dodan test projekt: Filip_Rados_lab5.Tests.csproj
+- Dodan WebApplicationFactory s EF InMemory bazom: ApiTestApplicationFactory.cs
+- Dodani CRUD integracijski testovi za sve API controllere: ApiCrudTests.cs
+- Dodan test projekt u solution: Filip_Rados_lab5.slnx
+- Dodan public partial class Program u Program.cs da WebApplicationFactory<Program> moze pokrenuti aplikaciju u testovima.
+
+Testovi pokrivaju:
+- GET all
+- GET by id
+- GET by id za nepostojeci ID
+- POST uspjesno kreiranje
+- POST validacijsku gresku
+- PUT uspjesno azuriranje
+- PUT za nepostojeci ID
+- DELETE uspjesno brisanje
+- DELETE za nepostojeci ID
+
+Pokriveni API endpointi:
+users, tags, posts, comments, messages, reports, likes, follows, notifications.
+
+Provjera:
+dotnet test .\Filip_Rados_lab5.Tests\Filip_Rados_lab5.Tests.csproj --no-restore
+
+Rezultat: Passed! 9/9.
+
+================================================================================
+33. KORISNIK
+================================================================================
+Logiraj mi ovaj chat, zapiši SVA moja pitanja i svoje odgovore u .txt datoteci.
+
+ASISTENT
+Kreiran je ovaj zapis u datoteci chat-log-lab5.txt.
+

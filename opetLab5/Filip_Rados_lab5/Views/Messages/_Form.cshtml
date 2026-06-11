@@ -1,0 +1,24 @@
+@model MessageFormModel
+
+<input asp-for="Id" type="hidden" />
+<div asp-validation-summary="ModelOnly" class="lh-validation-summary"></div>
+
+<div class="lh-field">
+    <label asp-for="Content" class="lh-label">Poruka</label>
+    <textarea asp-for="Content" class="lh-input lh-textarea"></textarea>
+    <span asp-validation-for="Content" class="lh-validation"></span>
+</div>
+
+<partial name="~/Views/Shared/_DateTimePicker.cshtml"
+         model="@(new DateTimeInputModel { Name = nameof(Model.SentAt), Label = "Datum slanja", Value = Model.SentAt })" />
+
+<partial name="~/Views/Shared/_Autocomplete.cshtml"
+         model="@(new AutocompleteInputModel { Name = nameof(Model.SenderId), Label = "Posiljatelj", SearchUrl = Url.Action("Autocomplete", "Users") ?? "", SelectedId = Model.SenderId, SelectedText = Model.SenderText, Placeholder = "Pretrazi korisnike..." })" />
+
+<partial name="~/Views/Shared/_Autocomplete.cshtml"
+         model="@(new AutocompleteInputModel { Name = nameof(Model.ReceiverId), Label = "Primatelj", SearchUrl = Url.Action("Autocomplete", "Users") ?? "", SelectedId = Model.ReceiverId, SelectedText = Model.ReceiverText, Placeholder = "Pretrazi korisnike..." })" />
+
+<label class="lh-check lh-check--single">
+    <input asp-for="IsRead" />
+    <span>Poruka je procitana</span>
+</label>

@@ -1,0 +1,20 @@
+@model List<Follow>
+@{
+    ViewData["Title"] = "Pracenja";
+    var query = ViewBag.Query as string;
+}
+
+<div class="lh-feed-wrapper">
+    <div class="lh-section-header">
+        <h2 class="lh-section-title">Pracenja <span data-result-count>(@Model.Count)</span></h2>
+        <a class="lh-button" asp-action="Create"><i class="fas fa-plus"></i> Novo pracenje</a>
+    </div>
+    <div class="lh-toolbar">
+        <i class="fas fa-magnifying-glass"></i>
+        <input class="lh-search-input" value="@query" placeholder="Pretrazi pracenja..."
+               data-ajax-search data-search-url="@Url.Action("Search", "Follows")" data-target="#follows-list" />
+    </div>
+    <div id="follows-list" data-list-shell><partial name="_List" model="Model" /></div>
+</div>
+
+@section Scripts { <script>LifeHack.initAjaxSearch();</script> }

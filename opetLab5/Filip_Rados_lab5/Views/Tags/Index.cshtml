@@ -1,0 +1,30 @@
+@model List<Tag>
+@{
+    ViewData["Title"] = "Tagovi";
+    var query = ViewBag.Query as string;
+}
+
+<div class="lh-feed-wrapper">
+    <div class="lh-section-header">
+        <h2 class="lh-section-title">Tagovi <span data-result-count>(@Model.Count)</span></h2>
+        <a class="lh-button" asp-action="Create"><i class="fas fa-plus"></i> Novi tag</a>
+    </div>
+
+    <div class="lh-toolbar">
+        <i class="fas fa-magnifying-glass"></i>
+        <input class="lh-search-input"
+               value="@query"
+               placeholder="Pretrazi tagove..."
+               data-ajax-search
+               data-search-url="@Url.Action("Search", "Tags")"
+               data-target="#tags-list" />
+    </div>
+
+    <div id="tags-list" data-list-shell>
+        <partial name="_List" model="Model" />
+    </div>
+</div>
+
+@section Scripts {
+    <script>LifeHack.initAjaxSearch();</script>
+}
